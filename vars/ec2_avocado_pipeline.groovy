@@ -14,6 +14,7 @@ def call(Map pipelineParams) {
             string(name: 'ARCH', defaultValue: pipelineParams.DEFAULT_ARCH, description: 'x86_64|aarch64')
             string(name: 'PROXY_URL', defaultValue: pipelineParams.DEFAULT_PROXY_URL, description: 'proxy ip:port to access internal ip')
             string(name: 'INSTANCE_TYPES', defaultValue: pipelineParams.DEFAULT_INSTANCE_TYPES, description: 'option, specify instance types you want to test, seperate by comma')
+            string(name: 'INSTANCE_NUM', defaultValue: '', description: 'option, how many instance to you want to test, default nightly compose is 1, production compose is 8')
             string(name: 'INSTANCE_DATE', defaultValue: '', description: 'option, only for new instance types available date')
             string(name: 'PKG_URL', defaultValue: '', description: 'option, Specify pkgs url you want to install')
             string(name: 'BRANCH_NAME', defaultValue: '', description: 'option, Specify branch name, eg. CentOS-Stream-8, RHEL-8.3')
@@ -82,8 +83,9 @@ def call(Map pipelineParams) {
             }
             stage ("Run Test") {
                 steps {
-                    ec2_avocado_cloud_run()
-                    echo "OK"
+                    withEnv(["INSTANCE_NUM=${params.INSTANCE_NUM}"]) {
+                        ec2_avocado_cloud_run()
+                    }
                 }
             }
             stage ("Save Result to Remote Server") {
