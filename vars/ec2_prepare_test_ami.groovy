@@ -63,7 +63,10 @@ def call() {
         cmd='yum update -y'
     fi
 
-    if [[ -z $PKG_URL && $COMPOSE_ID != "UNSPECIFIED" ]]; then
+    if ! ${UPDATE_BASEAMI}; then
+        new_ami=$ami_id
+        echo "Use baseami $new_ami directly in testing"
+    elif [[ -z $PKG_URL && $COMPOSE_ID != "UNSPECIFIED" ]]; then
         python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
         --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user \
         --keyfile ${KEYFILE} --proxy_url ${PROXY_URL} \
@@ -81,9 +84,11 @@ def call() {
     fi
 
     deactivate
-    cat $tmp_log
-    new_ami=$(cat $tmp_log| grep 'New AMI:'|awk -F':' '{print $NF}')
-    echo "Use $new_ami for test"
+    if ${UPDATE_BASEAMI}; then
+        cat $tmp_log
+        new_ami=$(cat $tmp_log| grep 'New AMI:'|awk -F':' '{print $NF}')
+        echo "Use $new_ami for test"
+    fi
     echo "IMAGE=$new_ami" >> $WORKSPACE/job_env.txt
     echo "IMAGE: $new_ami" >> $WORKSPACE/job_env.yaml
     BUILDNAME="${COMPOSE_ID}_${new_ami}"
