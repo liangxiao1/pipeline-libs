@@ -21,7 +21,7 @@ Test result: ${result.TESTRESULT}
 Auto analyze results:
    - ${result.AUTOCHECK}
 Know test failures:
-   - ${result.HISTORY}/bugspubview/list/
+   - ${env.LOG_SERVER}/bugspubview/list/
 Note: I will report bugs if there are new failures in the test log.
 
 Main Packages:
@@ -33,7 +33,7 @@ Instance Types:
 Debug Log:
    - ${result.HTMLURL}
 History Logs:
-   - ${result.HISTORY}
+   - ${env.LOG_SERVER}
         """,
         subject: "${env.JOB_NAME} - ${env.BUILD_DISPLAY_NAME} - ${currentBuild.currentResult}",
         from: "${pipelineParams.MAILSENDER}",

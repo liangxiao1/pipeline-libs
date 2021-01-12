@@ -53,6 +53,7 @@ def call(Map pipelineParams) {
             UMB_NAMESPACE="${pipelineParams.UMB_NAMESPACE}"
             UMB_TOPIC="${pipelineParams.UMB_TOPIC}"
             NFS_SERVER="${pipelineParams.NFS_SERVER}"
+            LOG_SERVER="${pipelineParams.LOG_SERVER}"
         }
         stages {
             stage('Parse COMPOSEID URL') {
