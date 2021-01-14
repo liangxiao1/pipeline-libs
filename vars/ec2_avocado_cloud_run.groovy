@@ -64,7 +64,7 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     cat /tmp/compose_${ARCH}.yaml
     python ec2_test_run.py --profile ${EC2_PROFILE} --ami-id $IMAGE --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} --ssh_user $ssh_user\
     --subnet_id ${EC2_SUBNET} --region ${EC2_REGION} --zone "${EC2_REGION}a" --casetag ${RUN_CASES} --result_dir $log_dir \
-    --instance_yaml /tmp/compose_${ARCH}.yaml --timeout 1152000 --ltp_url https://github.com/liangxiao1/rpmbuild_specs/releases/download/ltp-master-20191128/ltp-master-20191128.aarch64.rpm
+    --instance_yaml /tmp/compose_${ARCH}.yaml --timeout 1152000
     deactivate
     rm -rf /tmp/compose_${ARCH}.yaml
     rm -rf /tmp/sum_compose_${ARCH}.yaml
