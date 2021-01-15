@@ -10,7 +10,7 @@ def call(Map pipelineParams) {
             string(name: 'COMPOSEID_URL', defaultValue: '', description: 'this job can be triggerd by COMPOSEID_URL, CI_MESSAGE or BASE_AMI')
             string(name: 'CI_MESSAGE', defaultValue: '', description: 'this job can be triggerd by COMPOSEID_URL, CI_MESSAGE or BASE_AMI')
             string(name: 'BASE_AMI', defaultValue: '', description: 'this job can be triggerd by COMPOSEID_URL, CI_MESSAGE or BASE_AMI')
-            booleanParam(name: 'UPDATE_BASEAMI', defaultValue: true, description: 'do you want to upgrade BASE_AMI to the latest? if not, will use BASE_AMI in testing without any change.')
+            choice(name: 'UPDATE_BASEAMI', choices: ['true', 'false'], description: 'do you want to upgrade BASE_AMI to the latest? if not, will use BASE_AMI in testing without any change.')
             string(name: 'ARCH', defaultValue: pipelineParams.DEFAULT_ARCH, description: 'x86_64|aarch64')
             string(name: 'PROXY_URL', defaultValue: pipelineParams.DEFAULT_PROXY_URL, description: 'proxy ip:port to access internal ip')
             string(name: 'INSTANCE_TYPES', defaultValue: pipelineParams.DEFAULT_INSTANCE_TYPES, description: 'option, specify instance types you want to test, seperate by comma')
@@ -76,16 +76,12 @@ def call(Map pipelineParams) {
                 steps {
                     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'origin/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'avocado-cloud']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://code.engineering.redhat.com/gerrit/avocado-cloud']]]
                     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'origin/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'xen-ci']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://code.engineering.redhat.com/gerrit/xen-ci']]]
-                    withEnv(["UPDATE_BASEAMI=${params.UPDATE_BASEAMI}"]) {
-                        ec2_prepare_test_ami()
-                    }
+                    ec2_prepare_test_ami()
                 }
             }
             stage ("Run Test") {
                 steps {
-                    withEnv(["INSTANCE_NUM=${params.INSTANCE_NUM}"]) {
-                        ec2_avocado_cloud_run()
-                    }
+                    ec2_avocado_cloud_run()
                 }
             }
             stage ("Save Result to Remote Server") {
