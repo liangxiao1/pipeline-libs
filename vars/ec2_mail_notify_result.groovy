@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
 ${env.JOB_NAME} - ${env.BUILD_DISPLAY_NAME} - ${currentBuild.currentResult}
 Check console output at ${env.BUILD_URL}
 
-=================== VirtQE S1 AWS Test Report (TestOwner: ${result.TESTOWNER}) =====================
+=================== VirtQE S1 AWS Test Report (TestOwner: ${TESTOWNER}) =====================
 Summary:
 Test method: Automation
 Test suite:  ${result.TESTSUITE}

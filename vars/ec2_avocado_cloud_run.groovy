@@ -23,7 +23,7 @@ def call() {
     echo "Generate instance types yaml file in /tmp"
     instance_num=1
     if [[ ${INSTANCE_NUM} == '' ]];then
-        if [[ $COMPOSE_ID =~ '.n.' ]] || [[ $COMPOSE_ID =~ "update" ]]; then
+        if [[ $COMPOSE_ID =~ '.n.' ]] || [[ $COMPOSE_ID =~ "update" ]] || [[ $COMPOSE_ID =~ "RHEL-9" ]]; then
             instance_num=1
         else
             instance_num=8
