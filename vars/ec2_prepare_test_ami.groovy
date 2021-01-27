@@ -46,7 +46,7 @@ def call() {
     fi
     if [[ ${ARCH} =~ 'aarch64' ]]; then
         waitseconds=3600
-        instance_type='a1.large'
+        instance_type='t4g.medium'
     else
         waitseconds=1800
         instance_type='t2.large'
