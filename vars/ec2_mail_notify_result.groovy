@@ -19,7 +19,7 @@ Test result: ${result.TESTRESULT}
    - Error: ${result.ERRORS}
 
 Auto analyze results:
-   - ${result.AUTOCHECK}
+   ${result.AUTOCHECK}
 Know test failures:
    - ${env.LOG_SERVER}/bugspubview/list/
 Note: I will report bugs if there are new failures in the test log.
