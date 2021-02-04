@@ -98,7 +98,7 @@ ERRORS: $errors
 TOTAL: $total
 TESTRESULT: "$testresult"
 TESTSUITE: avocado-cloud
-AUTOCHECK: "$autocheck"
+AUTOCHECK: "\"$autocheck\""
 """>> $WORKSPACE/job_env.yaml
     '''
 }
