@@ -67,9 +67,15 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
         echo -e ${PREVIEW_INSTANCE_TYPES} > /tmp/compose_${ARCH}.yaml
     fi
     cat /tmp/compose_${ARCH}.yaml
-    python ec2_test_run.py --profile ${EC2_PROFILE} --ami-id $IMAGE --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} --ssh_user $ssh_user\
-    --subnet_id ${EC2_SUBNET} --region ${EC2_REGION} --zone "${EC2_REGION}a" --casetag ${RUN_CASES} --result_dir $log_dir \
-    --instance_yaml /tmp/compose_${ARCH}.yaml --timeout 1152000
+    if [[ -z ${EC2_ADDITIONALINFO} ]]; then
+        python ec2_test_run.py --profile ${EC2_PROFILE} --ami-id $IMAGE --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} --ssh_user $ssh_user\
+        --subnet_id ${EC2_SUBNET} --region ${EC2_REGION} --zone "${EC2_REGION}a" --casetag ${RUN_CASES} --result_dir $log_dir \
+        --instance_yaml /tmp/compose_${ARCH}.yaml --timeout 1152000
+    else
+        python ec2_test_run.py --profile ${EC2_PROFILE} --ami-id $IMAGE --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} --ssh_user $ssh_user\
+        --subnet_id ${EC2_SUBNET} --region ${EC2_REGION} --zone "${EC2_REGION}a" --casetag ${RUN_CASES} --result_dir $log_dir \
+        --instance_yaml /tmp/compose_${ARCH}.yaml --timeout 1152000 --additionalinfo ${EC2_ADDITIONALINFO}
+    fi
     deactivate
     rm -rf /tmp/compose_${ARCH}.yaml
     rm -rf /tmp/sum_compose_${ARCH}.yaml
