@@ -20,7 +20,7 @@ def call(Map pipelineParams) {
             string(name: 'BRANCH_NAME', defaultValue: '', description: 'option, Specify branch name, eg. CentOS-Stream-8, RHEL-8.3')
             string(name: 'RUN_CASES', defaultValue: pipelineParams.DEFALUT_RUN_CASES, description: 'case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
             choice(name: 'EC2_PROFILE', choices: ['default', pipelineParams.DEFAULT_EC2_PROFILE1, pipelineParams.DEFAULT_EC2_PROFILE2], description: 'account used for testing!')
-            choice(name: 'EC2_REGION', choices: ['us-west-2', 'us-west-1', 'us-east-1','us-east-2'], description: 'which region the test run in?')
+            string(name: 'EC2_REGION', defaultValue: 'us-west-2', description: 'which region the test run in?')
             string(name: 'EC2_SUBNET', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET, description: 'which subnet the test run in?')
             string(name: 'EC2_SG_GROUP', defaultValue: pipelineParams.DEFAULT_EC2_SG_GROUP, description: 'which security group the test run in?')
             string(name: 'EC2_ADDITIONALINFO', defaultValue: '', description: 'please split it by ";" if have more items')
