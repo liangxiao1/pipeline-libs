@@ -24,7 +24,7 @@ def call(Map pipelineParams) {
             string(name: 'EC2_SUBNET', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET, description: 'which subnet the test run in?')
             string(name: 'EC2_SG_GROUP', defaultValue: pipelineParams.DEFAULT_EC2_SG_GROUP, description: 'which security group the test run in?')
             string(name: 'EC2_ADDITIONALINFO', defaultValue: '', description: 'please split it by ";" if have more items')
-            text(name: 'PREVIEW_INSTANCE_TYPES', defaultValue: 'instance_types: !mux\n    xxxx.2xlarge:\n        instance_type: xxxx.2xlarge\n        cpu: 8\n        memory: 64\n        disks: 2\n        net_perf : 10\n        ipv6: True\n', description: 'Cannot get preview instances spec, so please input it manually!')
+            text(name: 'PREVIEW_INSTANCE_TYPES', defaultValue: 'instance_types: !mux\\n    xxxx.2xlarge:\\n        instance_type: xxxx.2xlarge\\n        cpu: 8\\n        memory: 64\\n        disks: 2\\n        net_perf : 10\\n        ipv6: True\\n', description: 'Cannot get preview instances spec, so please input it manually!')
         }
         options {
             buildDiscarder(logRotator(numToKeepStr: '20'))
