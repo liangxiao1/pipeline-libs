@@ -8,7 +8,7 @@ def call() {
         echo "${NFS_MOUNT_POINT} not found, create it"
         mkdir ${NFS_MOUNT_POINT}
     fi
-    if ! mount|grep ${NFS_SERVER}; then
+    if ! mount|grep ${NFS_MOUNT_POINT}; then
         echo "nfs not mount, mount it"
         sudo mount  ${NFS_SERVER}:${NFS_PATH_DIR} ${NFS_MOUNT_POINT}
     fi
