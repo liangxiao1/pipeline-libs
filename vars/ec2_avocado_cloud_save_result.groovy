@@ -21,6 +21,12 @@ def call() {
         branch_name='RHEL8.4'
     elif [[ "${COMPOSE_ID}" =~ "RHEL-8.5" ]];then
         branch_name='RHEL8.5'
+    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.1" ]];then
+        branch_name='RHEL8.1'
+    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.8" ]];then
+        branch_name='RHEL8.8'
+    elif [[ "${COMPOSE_ID}" =~ "RHEL-8" ]];then
+        branch_name='RHEL8'
     elif [[ "${COMPOSE_ID}" =~ "CentOS-Stream-8" ]];then
         branch_name='CentOS-Stream-8'
     elif [[ "${COMPOSE_ID}" =~ "CentOS-Stream-9" ]];then
@@ -31,6 +37,8 @@ def call() {
         branch_name='RHEL9.1'
     elif [[ "${COMPOSE_ID}" =~ "RHEL-9.2" ]];then
         branch_name='RHEL9.2'
+    elif [[ "${COMPOSE_ID}" =~ "RHEL-9" ]];then
+        branch_name='RHEL9'
     elif [[ "${COMPOSE_ID}" =~ "RHEL-7.8" ]];then
         branch_name='RHEL7.8'
     elif [[ "${COMPOSE_ID}" =~ "RHEL-7.9" ]];then
