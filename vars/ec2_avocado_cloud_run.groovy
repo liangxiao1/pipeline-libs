@@ -42,7 +42,7 @@ def call() {
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r --skip_instance a1.metal \
                 -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
                 ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
-            elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]
+            elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r \
                 -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
                 ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c --max_mem 16

@@ -40,6 +40,9 @@ def call() {
         if [[ "$compose_id" =~ "RHEL-7" ]];then
             echo "This is RHEL-7 compose build"
             repo_url="$baseurl/compose/Server/${ARCH}/os/"
+        elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
+            echo "This is $compose_id compose build, use BaseOS and AppStream repos"
+            repo_url="${baseurl}/BaseOS/${ARCH}/os/,${baseurl}/AppStream/${ARCH}/os/"
         else
             echo "This is $compose_id compose build, use BaseOS and AppStream repos"
             repo_url="${baseurl}/compose/BaseOS/${ARCH}/os/,${baseurl}/compose/AppStream/${ARCH}/os/"
