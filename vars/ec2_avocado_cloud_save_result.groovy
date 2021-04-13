@@ -31,6 +31,8 @@ def call() {
         branch_name='CentOS-Stream-8'
     elif [[ "${COMPOSE_ID}" =~ "CentOS-Stream-9" ]];then
         branch_name='CentOS-Stream-9'
+    elif [[ "${COMPOSE_ID}" =~ "CentOS-Stream" ]];then
+        branch_name='CentOS-Stream'
     elif [[ "${COMPOSE_ID}" =~ "RHEL-9.0" ]];then
         branch_name='RHEL9.0'
     elif [[ "${COMPOSE_ID}" =~ "RHEL-9.1" ]];then
