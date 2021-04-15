@@ -19,6 +19,8 @@ def call() {
         source ${WORKSPACE}/job_env.txt
         if ! [ -z $JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID ]; then
             baseurl="${COMPOSE_LOCATION}/${JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID}"
+        else
+            baseurl=$JOB_LOCATION
         fi
         baseurl=${baseurl//'"'}
         baseurl=${baseurl%/compose/}
