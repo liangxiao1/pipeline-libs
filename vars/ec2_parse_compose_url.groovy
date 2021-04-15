@@ -17,7 +17,9 @@ def call() {
         echo "CI Message: ${CI_MESSAGE}"
         python /home/ec2/mini_utils/json_parser.py -c "${CI_MESSAGE}" --dir "${WORKSPACE}" -d
         source ${WORKSPACE}/job_env.txt
-        baseurl=$JOB_LOCATION
+        if ! [ -z $JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID ]; then
+            baseurl="${COMPOSE_LOCATION}/${JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID}"
+        fi
         baseurl=${baseurl//'"'}
         baseurl=${baseurl%/compose/}
         baseurl=${baseurl%/compose}
