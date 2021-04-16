@@ -6,20 +6,20 @@ def call(Map pipelineParams) {
                 customWorkspace "workspace/${env.JOB_NAME}-${env.BUILD_ID}"
             }
         }
-        triggers {
-            //https://plugins.jenkins.io/urltrigger/
-            URLTrigger(
-                cronTabSpec: '* * * * *',
-                entries: [
-                    URLTriggerEntry(
-                        url: 'http://mirror.centos.org/centos/8-stream/COMPOSE_ID',
-                        contentTypes: [
-                            MD5Sum()
-                        ]
-                    )
-                ]
-            )
-        }
+        //triggers {
+        //    //https://plugins.jenkins.io/urltrigger/
+        //    URLTrigger(
+        //        cronTabSpec: '* * * * *',
+        //        entries: [
+        //            URLTriggerEntry(
+        //                url: 'http://mirror.centos.org/centos/8-stream/COMPOSE_ID',
+        //                contentTypes: [
+        //                    MD5Sum()
+        //                ]
+        //            )
+        //        ]
+        //    )
+        //}
         parameters {
             string(name: 'COMPOSEID_URL', defaultValue: '', description: 'this job can be triggerd by COMPOSEID_URL, CI_MESSAGE or BASE_AMI')
             string(name: 'CI_MESSAGE', defaultValue: '', description: 'this job can be triggerd by COMPOSEID_URL, CI_MESSAGE or BASE_AMI')
