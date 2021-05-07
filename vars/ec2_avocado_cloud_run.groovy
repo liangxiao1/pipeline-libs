@@ -46,6 +46,17 @@ def call() {
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r \
                 -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
                 ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c --max_mem 16
+            elif ! [ -z $JOB_INFO_BUILD_ID ]; then
+                RUN_CASES=${JOB_INFO_PACKAGE_NAME}
+                # virt-what test t2.small,t3.small,z1d.metal,t4g.small,m6g.metal instances
+                if ! [[ ${PREVIEW_INSTANCE_TYPES} =~ 'virt-what' ]]; then
+                    instances='t2.small,t3.small,z1d.metal,t4g.small,m6g.metal'
+                else
+                    instances='t2.small,t3.small,t4g.small'
+                fi
+                python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $instances \
+                     -f /tmp/compose_${ARCH}.yaml --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
+                     ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
             else
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r \
                 -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \

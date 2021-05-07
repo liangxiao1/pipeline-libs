@@ -22,8 +22,13 @@ def call() {
         echo "No JOB_BASE_AMI specified, auto select one!"
         source /home/ec2/ec2_venv/bin/activate
         cd /home/ec2/mini_utils/
-        python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -d -p ${ARCH}
-        ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -p ${ARCH})
+        if [ -z $JOB_INFO_BUILD_ID ]; then
+            python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -d -p ${ARCH}
+            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -p ${ARCH})
+        else
+            python ec2_ami_select.py -f data/branch_map.yaml -c $JOB_BREWTAG -s ami_id -d -p ${ARCH}
+            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $JOB_BREWTAG -s ami_id -p ${ARCH})
+        fi
         deactivate
     else
         echo "Use specified $BASE_AMI"

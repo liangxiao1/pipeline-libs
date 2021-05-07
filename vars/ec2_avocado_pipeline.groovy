@@ -71,6 +71,7 @@ def call(Map pipelineParams) {
             LOG_SERVER="${pipelineParams.LOG_SERVER}"
             TESTOWNER="${pipelineParams.TESTOWNER}"
             COMPOSE_LOCATION="${pipelineParams.COMPOSE_LOCATION}"
+            BREW_BUILD_URL="${pipelineParams.BREW_BUILD_URL}"
         }
         stages {
             stage('Parse COMPOSEID URL') {
@@ -117,6 +118,7 @@ def call(Map pipelineParams) {
             success {
                 ec2_mail_notify_result(MAILSENDER: DEFAULT_MAIL_SENDER, MAILRECEIVER: DEFAULT_MAIL_RECEIVER_SUCCESS)
                 ec2_umb_notify_result()
+                ec2_umb_notify_result_brew()
                 cleanWs()
             }
             failure {
