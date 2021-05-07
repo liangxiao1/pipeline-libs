@@ -47,7 +47,7 @@ def call() {
                 -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
                 ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c --max_mem 16
             elif ! [ -z $JOB_INFO_BUILD_ID ]; then
-                RUN_CASES=${JOB_INFO_PACKAGE_NAME}
+                RUN_CASES=${JOB_INFO_PACKAGE_NAME/'-'/'_'}
                 # virt-what test t2.small,t3.small,z1d.metal,t4g.small,m6g.metal instances
                 if ! [[ ${PREVIEW_INSTANCE_TYPES} =~ 'virt-what' ]]; then
                     instances='t2.small,t3.small,z1d.metal,t4g.small,m6g.metal'
