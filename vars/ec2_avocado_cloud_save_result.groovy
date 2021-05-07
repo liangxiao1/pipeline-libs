@@ -9,46 +9,10 @@ def call() {
     sh '''
     #!/bin/bash -x
     source $WORKSPACE/job_env.txt
-    if [[ "${COMPOSE_ID}" =~ "RHEL-8.6" ]];then
-        branch_name='RHEL8.6'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.7" ]];then
-        branch_name='RHEL8.7'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.2" ]];then
-        branch_name='RHEL8.2'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.3" ]];then
-        branch_name='RHEL8.3'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.4" ]];then
-        branch_name='RHEL8.4'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.5" ]];then
-        branch_name='RHEL8.5'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.1" ]];then
-        branch_name='RHEL8.1'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8.8" ]];then
-        branch_name='RHEL8.8'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-8" ]];then
-        branch_name='RHEL8'
-    elif [[ "${COMPOSE_ID}" =~ "CentOS-Stream-8" ]];then
-        branch_name='CentOS-Stream-8'
-    elif [[ "${COMPOSE_ID}" =~ "CentOS-Stream-9" ]];then
-        branch_name='CentOS-Stream-9'
-    elif [[ "${COMPOSE_ID}" =~ "CentOS-Stream" ]];then
-        branch_name='CentOS-Stream'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-9.0" ]];then
-        branch_name='RHEL9.0'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-9.1" ]];then
-        branch_name='RHEL9.1'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-9.2" ]];then
-        branch_name='RHEL9.2'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-9" ]];then
-        branch_name='RHEL9'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-7.8" ]];then
-        branch_name='RHEL7.8'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-7.9" ]];then
-        branch_name='RHEL7.9'
-    elif [[ "${COMPOSE_ID}" =~ "RHEL-7.10" ]];then
-        branch_name='RHEL7.10'
-    elif [[ "${COMPOSE_ID}" =~ "UNSPECIFIED" ]];then
-        branch_name='RHEL8'
+    if ! [ -z $BRANCH_NAME ]; then
+        branch_name=$BRANCH_NAME
+    else
+        branch_name='UNSPECIFIED'
     fi
 
     # Copy result to remote disk

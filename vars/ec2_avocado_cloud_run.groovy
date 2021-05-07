@@ -56,7 +56,7 @@ def call() {
                 fi
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $instances \
                      -f /tmp/compose_${ARCH}.yaml --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
-                     ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
+                     ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c -${ARCH}
             else
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r \
                 -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \

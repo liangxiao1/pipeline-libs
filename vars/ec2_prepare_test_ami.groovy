@@ -25,9 +25,14 @@ def call() {
         if [ -z $JOB_INFO_BUILD_ID ]; then
             python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -d -p ${ARCH}
             ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -p ${ARCH})
+            branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s branch_name)
         else
             python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s ami_id -d -p ${ARCH}
             ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s ami_id -p ${ARCH})
+            branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s branch_name)
+        fi
+        if ! [ -z $branch_name ]; then
+            echo "BRANCH_NAME=${BRANCH_NAME}" >> $WORKSPACE/job_env.txt
         fi
         deactivate
     else
@@ -77,7 +82,7 @@ def call() {
         python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
         --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user \
         --keyfile ${KEYFILE} --proxy_url ${PROXY_URL} \
-        --pkg_url $PKG_URL --instance_type $instance_type --cmds "$cmd" > $tmp_log 2>&1
+        --pkg_url $PKG_URL --instance_type $instance_type > $tmp_log 2>&1
     elif [[ -z $PKG_URL && $COMPOSEID_URL != "UNSPECIFIED" ]]; then
         python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
         --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user \
