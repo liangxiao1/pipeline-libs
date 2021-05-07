@@ -34,6 +34,7 @@ def call() {
             baseurl=${baseurl%/compose}
             COMPOSEID_URL="${baseurl}/COMPOSE_ID"
             export trigger_url=${COMPOSEID_URL}
+        fi
     elif ! [ -z ${COMPOSEID_URL} ]; then
         echo "This is triggerd by manually."
         build_owner="MANUAL_TRIGGER"

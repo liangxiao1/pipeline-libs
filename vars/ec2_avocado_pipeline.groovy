@@ -123,7 +123,6 @@ def call(Map pipelineParams) {
             }
             failure {
                 mail_notify_simple_params(MAILSENDER: DEFAULT_MAIL_SENDER, MAILRECEIVER: DEFAULT_MAIL_RECEIVER_FAIL, ATTACHLOG: false)
-                cleanWs()
              }
         }
     }
