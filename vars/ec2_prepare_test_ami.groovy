@@ -26,8 +26,8 @@ def call() {
             python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -d -p ${ARCH}
             ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -p ${ARCH})
         else
-            python ec2_ami_select.py -f data/branch_map.yaml -c \\"$JOB_BREWTAG\\" -s ami_id -d -p ${ARCH}
-            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $JOB_BREWTAG -s ami_id -p ${ARCH})
+            python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s ami_id -d -p ${ARCH}
+            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s ami_id -p ${ARCH})
         fi
         deactivate
     else
