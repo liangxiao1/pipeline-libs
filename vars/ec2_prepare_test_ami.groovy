@@ -32,7 +32,7 @@ def call() {
             branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s branch_name)
         fi
         if ! [ -z $branch_name ]; then
-            echo "BRANCH_NAME=${BRANCH_NAME}" >> $WORKSPACE/job_env.txt
+            echo "BRANCH_NAME=${branch_name}" >> $WORKSPACE/job_env.txt
         fi
         deactivate
     else
@@ -45,14 +45,14 @@ def call() {
     if [[ $COMPOSE_ID =~ 'RHEL-7' ]]; then
         pkgs="install,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,ntpdate,perf,nvme-cli,pciutils,fio,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman"
     elif [[ $COMPOSE_ID =~ 'RHEL-8' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools"
     elif [[ $COMPOSE_ID =~ 'RHEL-9' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3,hostname,podman"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3,hostname,podman,xdp-tools"
     elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
         ssh_user='centos'
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools"
     else
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools"
     fi
     if [[ ${ARCH} =~ 'aarch64' ]]; then
         waitseconds=3600

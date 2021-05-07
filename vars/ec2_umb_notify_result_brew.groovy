@@ -3,13 +3,12 @@ def call() {
     ci = readYaml file: "job_env.yaml"
     String date = sh(script: 'date -uIs', returnStdout: true).trim()
     echo "${date}"
-    def thread_id = sh(script: "echo ${ci.COMPOSE_ID} | md5sum | awk '{print \$1}'", returnStdout: true).trim()
-    thread_id = thread_id + "${ci.JOB_ARCH}"
+    def thread_id = sh(script: "echo ${ci.COMPOSE_ID}${ci.ARCH} | md5sum | awk '{print \$1}'", returnStdout: true).trim()
     def scratch = ''
     if ( "${ci.SCRATCH}" == 'true' ) {
-        scratch = 'true'
+        scratch = true
     } else {
-        scratch = 'false'
+        scratch = false
     }
     def message_content = """\
 {
@@ -28,25 +27,22 @@ def call() {
   },
   "artifact": {
     "type": "brew-build",
-    "id": "${ci.JOB_INFO_TASK_ID}",
+    "id": ${ci.JOB_INFO_TASK_ID},
     "issuer": "${ci.JOB_INFO_OWNER_NAME}",
     "component": "${ci.JOB_INFO_PACKAGE_NAME}",
     "nvr": "${ci.JOB_INFO_NVR}",
-    "scratch": "${scratch}"
+    "scratch": ${scratch}
   },
   "system": {
     "os": "${ci.JOB_INFO_VOLUME_NAME}",
     "provider": "avocado-cloud",
     "architecture": "${ci.ARCH}"
   },
-  "label": [
-            "${ci.ARCH}"
-    ],
   "type": "tier1",
   "category": "functional",
   "thread_id": "${thread_id}",
-  "status": "${ci.TESTRESULT}",
-  "namespace": "${ci.NAMESPACE}.brew-build",
+  "status": "${ci.UMB_TESTRESULT}",
+  "namespace": "${UMB_NAMESPACE}",
   "generated_at": "${date}",
   "version": "0.1.0"
 }"""

@@ -50,9 +50,10 @@ def call() {
                 RUN_CASES=${JOB_INFO_PACKAGE_NAME/'-'/'_'}
                 # virt-what test t2.small,t3.small,z1d.metal,t4g.small,m6g.metal instances
                 if ! [[ ${PREVIEW_INSTANCE_TYPES} =~ 'virt-what' ]]; then
-                    instances='t2.small,t3.small,z1d.metal,t4g.small,m6g.metal'
+                    # skip z1d.metal for now as os-tests issue
+                    instances='t2.small,t3.small,t4g.small,c6g.medium,m6g.metal'
                 else
-                    instances='t2.small,t3.small,t4g.small'
+                    instances='t2.small,t3.small,t4g.small,c6g.medium'
                 fi
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $instances \
                      -f /tmp/compose_${ARCH}.yaml --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \

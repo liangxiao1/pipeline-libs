@@ -91,8 +91,8 @@ def call(Map pipelineParams) {
             }
             stage("Prepare image") {
                 steps {
-                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'origin/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'avocado-cloud']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://code.engineering.redhat.com/gerrit/avocado-cloud']]]
-                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'origin/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'xen-ci']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://code.engineering.redhat.com/gerrit/xen-ci']]]
+                    //checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'origin/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'avocado-cloud']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://code.engineering.redhat.com/gerrit/avocado-cloud']]]
+                    //checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'origin/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'xen-ci']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://code.engineering.redhat.com/gerrit/xen-ci']]]
                     ec2_prepare_test_ami()
                 }
             }
@@ -117,8 +117,14 @@ def call(Map pipelineParams) {
             }
             success {
                 ec2_mail_notify_result(MAILSENDER: DEFAULT_MAIL_SENDER, MAILRECEIVER: DEFAULT_MAIL_RECEIVER_SUCCESS)
-                ec2_umb_notify_result()
-                ec2_umb_notify_result_brew()
+                script{
+                    if (env.UMB_TOPIC.contains('brew-build')){
+                        ec2_umb_notify_result_brew()
+                    }
+                    else{
+                        ec2_umb_notify_result()
+                    }
+                }
                 cleanWs()
             }
             failure {

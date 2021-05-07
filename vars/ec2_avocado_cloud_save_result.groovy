@@ -37,9 +37,11 @@ def call() {
     total=$((pass+errors+failures))
     if [[ $pass == $total ]];then
         testresult="PASS"
+        umb_testresult="passed"
         testcomment="PASS"
     else
         testresult="failed"
+        umb_testresult="failed"
         testcomment="FAILED"
         echo $auto_analyze
         if [[ "$auto_analyze" =~ "No similar failure" ]];then
@@ -71,6 +73,7 @@ FAILURES: $failures
 ERRORS: $errors
 TOTAL: $total
 TESTRESULT: "$testresult"
+UMB_TESTRESULT: "$umb_testresult"
 TESTSUITE: avocado-cloud
 AUTOCHECK: \\"$autocheck\\"
 """>> $WORKSPACE/job_env.yaml

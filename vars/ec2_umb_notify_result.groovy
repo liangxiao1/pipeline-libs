@@ -3,8 +3,7 @@ def call() {
     ci = readYaml file: "job_env.yaml"
     String date = sh(script: 'date -uIs', returnStdout: true).trim()
     echo "${date}"
-    def thread_id = sh(script: "echo ${ci.COMPOSE_ID} | md5sum | awk '{print \$1}'", returnStdout: true).trim()
-    thread_id = thread_id + "${ci.JOB_ARCH}"
+    def thread_id = sh(script: "echo ${ci.COMPOSE_ID}${ci.ARCH} | md5sum | awk '{print \$1}'", returnStdout: true).trim()
     def scratch = ''
     if ( "${ci.SCRATCH}" == 'true' ) {
         scratch = 'true'
