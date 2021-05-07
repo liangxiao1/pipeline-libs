@@ -21,8 +21,8 @@ def call() {
             baseurl="${COMPOSE_LOCATION}/${JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID}"
         elif ! [ -z $JOB_INFO_BUILD_ID ]; then
             echo "This is brew build pkg test"
-            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${job_env.JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-\\d*.*(noarch|${DEFAULT_ARCH})" --notkeyword "src"
-            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${job_env.JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "rhel" --field text --name BREWTAG
+            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-\\d*.*(noarch|${DEFAULT_ARCH})" --notkeyword "src"
+            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "rhel" --field text --name BREWTAG
             PKG_URL=${JOB_PKGURL}
             compose_id=${JOB_INFO_NVR}
         else
