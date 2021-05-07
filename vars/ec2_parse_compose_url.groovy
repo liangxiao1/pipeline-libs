@@ -42,7 +42,9 @@ def call() {
     fi
     if [ -z ${trigger_url} ]; then
         echo "compose url not found, do not update image"
-        compose_id="UNSPECIFIED"
+        if [ -z ${compose_id} ]; then;
+            compose_id="UNSPECIFIED"
+        fi
         baseurl="UNSPECIFIED"
         COMPOSEID_URL="UNSPECIFIED"
         repo_url="UNSPECIFIED"
