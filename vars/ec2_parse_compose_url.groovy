@@ -21,8 +21,12 @@ def call() {
             baseurl="${COMPOSE_LOCATION}/${JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID}"
         elif ! [ -z $JOB_INFO_BUILD_ID ]; then
             echo "This is brew build pkg test"
-            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-\\d*.*(noarch|${DEFAULT_ARCH})" --notkeyword "src"
-            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "rhel" --field text --name BREWTAG
+            if ! [[ ${JOB_INFO_PACKAGE_NAME} =~ 'kernel' ]]; then
+            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-\\d*.*(noarch|${DEFAULT_ARCH})" --excludekeys "src"
+            else
+            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-" --excludekeys "src,devel,internal,debuginfo,extra,headers,cross,debug,tools" --andkeys "x86" --element a --field href     
+            fi
+            python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "Tags" --element tr --field text --name BREWTAG -r
             source ${WORKSPACE}/job_env.txt
             PKG_URL=${JOB_PKGURL}
             compose_id=${JOB_INFO_NVR}

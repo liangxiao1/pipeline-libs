@@ -49,11 +49,11 @@ def call() {
             elif ! [ -z $JOB_INFO_BUILD_ID ]; then
                 RUN_CASES=${JOB_INFO_PACKAGE_NAME/'-'/'_'}
                 # virt-what test t2.small,t3.small,z1d.metal,t4g.small,m6g.metal instances
-                if ! [[ ${PREVIEW_INSTANCE_TYPES} =~ 'virt-what' ]]; then
-                    # skip z1d.metal for now as os-tests issue
-                    instances='t2.small,t3.small,t4g.small,c6g.medium,m6g.metal'
+                if [[ ${JOB_INFO_PACKAGE_NAME} =~ 'virt-what' ]]; then
+                    # skip t2.small for now as bz1986909
+                    instances='t3.small,t4g.small,c6g.medium,m6g.metal,z1d.metal'
                 else
-                    instances='t2.small,t3.small,t4g.small,c6g.medium'
+                    instances='t3.small,t4g.small,c6g.medium'
                 fi
                 python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $instances \
                      -f /tmp/compose_${ARCH}.yaml --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \

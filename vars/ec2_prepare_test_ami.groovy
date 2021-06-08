@@ -27,9 +27,11 @@ def call() {
             ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -p ${ARCH})
             branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s branch_name)
         else
-            python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s ami_id -d -p ${ARCH}
-            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s ami_id -p ${ARCH})
-            branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${JOB_BREWTAG//' '} -s branch_name)
+            # sleep 1200 to wait brew tag
+            sleep 1200
+            python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s ami_id -d -p ${ARCH}
+            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s ami_id -p ${ARCH})
+            branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s branch_name)
         fi
         if ! [ -z $branch_name ]; then
             echo "BRANCH_NAME=${branch_name}" >> $WORKSPACE/job_env.txt
@@ -45,21 +47,21 @@ def call() {
     if [[ $COMPOSE_ID =~ 'RHEL-7' ]]; then
         pkgs="install,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,ntpdate,perf,nvme-cli,pciutils,fio,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman"
     elif [[ $COMPOSE_ID =~ 'RHEL-8' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel"
     elif [[ $COMPOSE_ID =~ 'RHEL-9' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3,hostname,podman,xdp-tools"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks"
     elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
         ssh_user='centos'
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3-pip,dracut-fips,podman,xdp-tools,openssl-devel"
     else
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel"
     fi
     if [[ ${ARCH} =~ 'aarch64' ]]; then
-        waitseconds=3600
+        waitseconds=800
         instance_type='t4g.medium'
     else
-        waitseconds=1800
-        instance_type='t2.large'
+        waitseconds=600
+        instance_type='t3.small'
     fi
     if [[ $COMPOSE_ID =~ '.n.' ]]; then
         echo "It is nightly build, wait ${waitseconds}s to make sure repo ready!"
