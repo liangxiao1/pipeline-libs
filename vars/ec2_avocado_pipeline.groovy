@@ -70,7 +70,7 @@ def call(Map pipelineParams) {
             NFS_SERVER="${pipelineParams.NFS_SERVER}"
             LOG_SERVER="${pipelineParams.LOG_SERVER}"
             TESTOWNER="${pipelineParams.TESTOWNER}"
-            COMPOSE_LOCATION="${pipelineParams.COMPOSE_LOCATION}"
+            //COMPOSE_LOCATION="${pipelineParams.COMPOSE_LOCATION}"
             BREW_BUILD_URL="${pipelineParams.BREW_BUILD_URL}"
         }
         stages {

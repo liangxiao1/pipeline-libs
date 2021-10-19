@@ -18,7 +18,8 @@ def call() {
         python /home/ec2/mini_utils/json_parser.py -c "${CI_MESSAGE}" --dir "${WORKSPACE}" -d
         source ${WORKSPACE}/job_env.txt
         if ! [ -z $JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID ]; then
-            baseurl="${COMPOSE_LOCATION}/${JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID}"
+            #baseurl="${COMPOSE_LOCATION}/${JOB_COMPOSE_COMPOSE_INFO_PAYLOAD_COMPOSE_ID}"
+            baseurl="${JOB_COMPOSE_COMPOSE_URL}"
         elif ! [ -z $JOB_INFO_BUILD_ID ]; then
             echo "This is brew build pkg test"
             if ! [[ ${JOB_INFO_PACKAGE_NAME} =~ 'kernel' ]]; then

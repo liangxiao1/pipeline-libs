@@ -26,7 +26,7 @@ def call() {
         if [[ $COMPOSE_ID =~ '.n.' ]] || [[ $COMPOSE_ID =~ '.t.' ]] || [[ $COMPOSE_ID =~ "update" ]] || [[ $COMPOSE_ID =~ "RHEL-9" ]]||[[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
             instance_num=1
         else
-            instance_num=5
+            instance_num=1
         fi
     else
         instance_num=${INSTANCE_NUM}
