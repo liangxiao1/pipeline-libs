@@ -45,13 +45,13 @@ def call() {
     ssh_user='ec2-user'
 
     if [[ $COMPOSE_ID =~ 'RHEL-7' ]]; then
-        pkgs="install,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,ntpdate,perf,nvme-cli,pciutils,fio,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,strace,sos,strace"
+        pkgs="install,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,ntpdate,perf,nvme-cli,pciutils,fio,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,strace,sos,strace,acpid"
     elif [[ $COMPOSE_ID =~ 'RHEL-8' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel,sos,strace"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel,sos,strace,acpid"
     elif [[ $COMPOSE_ID =~ 'RHEL-9' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace,acpid"
     elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
-        ssh_user='centos'
+        #ssh_user='centos'
         pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3-pip,dracut-fips,podman,xdp-tools,openssl-devel,sos,strace"
     else
         pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,rng-tools,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel,sos,strace"
@@ -72,34 +72,28 @@ def call() {
     repo_url=$REPO_URL
     source /home/ec2/ec2_venv/bin/activate
     cd /home/ec2/mini_utils/
+    build_cmd="python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
+        --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user --keyfile ${KEYFILE} \
+        --proxy_url ${PROXY_URL} --instance_type $instance_type"
     cmd='uname -r'
     if ${UPDATE_BASEAMI}; then
-        cmd='yum update -y'
+        cmd=${POST_CMDS}
+        if ${IS_INSTALL_PKG_LIST}; then
+            build_cmd="${build_cmd} --pkgs $pkgs"
+        fi
     fi
 
     if ! ${UPDATE_BASEAMI}; then
         new_ami=$ami_id
         echo "Use baseami $new_ami directly in testing"
     elif ! [ -z $JOB_INFO_BUILD_ID ]; then
-        python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
-        --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user \
-        --keyfile ${KEYFILE} --proxy_url ${PROXY_URL} \
-        --pkg_url $PKG_URL --instance_type $instance_type > $tmp_log 2>&1
+        $build_cmd --pkg_url $PKG_URL  > $tmp_log 2>&1
     elif [[ -z $PKG_URL && $COMPOSEID_URL != "UNSPECIFIED" ]]; then
-        python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
-        --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user \
-        --keyfile ${KEYFILE} --proxy_url ${PROXY_URL} \
-        --repo_url $repo_url --pkgs $pkgs --instance_type $instance_type --cmds "$cmd" > $tmp_log 2>&1
+        $build_cmd --repo_url $repo_url --cmds "$cmd" > $tmp_log 2>&1
     elif [[ -z $PKG_URL && $COMPOSEID_URL == "UNSPECIFIED" ]]; then
-        python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
-        --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user \
-        --keyfile ${KEYFILE} --proxy_url ${PROXY_URL} \
-        --pkgs $pkgs --instance_type $instance_type --cmds "$cmd" > $tmp_log 2>&1
+        $build_cmd --cmds "$cmd"  > $tmp_log 2>&1
     else
-        python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
-        --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user \
-        --keyfile ${KEYFILE} --proxy_url ${PROXY_URL} \
-        --repo_url $repo_url --pkgs $pkgs --pkg_url $PKG_URL --instance_type $instance_type --cmds "$cmd" > $tmp_log 2>&1
+        $build_cmd --repo_url $repo_url --pkg_url $PKG_URL --cmds "$cmd"  > $tmp_log 2>&1
     fi
 
     deactivate

@@ -76,7 +76,8 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     fi
     ssh_user='ec2-user'
     if [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
-        ssh_user='centos'
+        #ssh_user='centos'
+        echo "$ssh_user"
     fi
     if ! [[ ${PREVIEW_INSTANCE_TYPES} =~ 'xxxx' ]]; then
         echo "manually instance spec specified, use it"
