@@ -35,7 +35,7 @@ def call() {
   },
   "system": {
     "os": "${ci.JOB_INFO_VOLUME_NAME}",
-    "provider": "avocado-cloud",
+    "provider": "os-tests",
     "architecture": "${ci.ARCH}"
   },
   "type": "tier1",

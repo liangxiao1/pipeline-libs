@@ -77,6 +77,7 @@ def call(Map pipelineParams) {
             NFS_MOUNT_POINT="${pipelineParams.NFS_MOUNT_POINT}"
             LOG_SERVER="${pipelineParams.LOG_SERVER}"
             TESTOWNER="${pipelineParams.TESTOWNER}"
+            IS_INSTALL_PKG_LIST="${pipelineParams.IS_INSTALL_PKG_LIST}"
             //COMPOSE_LOCATION="${pipelineParams.COMPOSE_LOCATION}"
             BREW_BUILD_URL="${pipelineParams.BREW_BUILD_URL}"
             UPLOAD_REPORTPORTAL="${pipelineParams.UPLOAD_REPORTPORTAL}"

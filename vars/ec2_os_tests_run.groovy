@@ -31,52 +31,54 @@ def call() {
     else
         instance_num=${INSTANCE_NUM}
     fi
+    instances_yaml=$WORKSPACE/compose_${ARCH}.yaml
+    instances_sum_yaml=$WORKSPACE/sum_compose_${ARCH}.yaml
     echo "get instance type spec"
     if [[ -z $JOB_INSTANCE_TYPES ]]; then
         if [[ $COMPOSE_ID =~ 'RHEL-6' ]]|[[ $COMPOSE_ID =~ 'RHEL-7' ]]|[[ $COMPOSE_ID =~ 'RHEL-8.0' ]]|[[ $COMPOSE_ID =~ 'RHEL-8.1' ]]; then
             echo "Skip a1.metal instance as not support prior RHEL8.2"
             python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r --skip_instance a1.metal \
-            -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
+            -f ${instances_yaml} --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
             ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
         elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
             python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r \
-            -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
+            -f ${instances_yaml} --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
             ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c --max_mem 16
         elif ! [ -z $JOB_INFO_BUILD_ID ]; then
             RUN_CASES=${JOB_INFO_PACKAGE_NAME/'-'/'_'}
             # virt-what test t2.small,t3.small,z1d.metal,t4g.small,m6g.metal instances
             if [[ ${JOB_INFO_PACKAGE_NAME} =~ 'virt-what' ]]; then
-                # skip t2.small for now as bz1986909
-                instances='t3.small,t4g.small,c6g.medium,m6g.metal,z1d.metal'
+                instances='t2.small,t3.small,t4g.small,c6g.medium,m6g.metal,z1d.metal'
+                RUN_CASES='virtwhat'
             else
                 instances='t3.small,t4g.small,c6g.medium'
             fi
             python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $instances \
-                 -f /tmp/compose_${ARCH}.yaml --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
+                 -f ${instances_yaml} --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
                  ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c -${ARCH}
         else
             python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r \
-            -f /tmp/compose_${ARCH}.yaml --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
+            -f ${instances_yaml} --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
             ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
         fi
     else
         python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $JOB_INSTANCE_TYPES \
-        -f /tmp/compose_${ARCH}.yaml --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
+        -f ${instances_yaml} --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
         ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
     fi
 
     if [[ -z $JOB_INSTANCE_TYPES ]]; then
-        job_instance_types=$(cat /tmp/sum_compose_${ARCH}.yaml)
+        job_instance_types=$(cat ${instances_sum_yaml})
         echo """\
 JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     JOB_INSTANCE_TYPES=$job_instance_types
     fi
     ssh_user='ec2-user'
     if [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
-        #ssh_user='centos'
+        ssh_user='centos'
         echo "$ssh_user"
     fi
-    cat /tmp/compose_${ARCH}.yaml
+    cat ${instances_yaml}
     test_date=$(date +%Y%m%d)
     for instance in ${JOB_INSTANCE_TYPES//,/ }; do
         echo """\
@@ -116,25 +118,71 @@ instance_type: ${instance}
         echo "HTMLURL: NotSetNFS_SEVER" >> $WORKSPACE/job_env.yaml
     fi
     deactivate
+    testresult=''
+    umb_testresult="passed"
     if ${UPLOAD_REPORTPORTAL}; then
+        launchids=''
         echo "upload test result to reportportal"
+        source /home/ec2/rp_preproc_venv/bin/activate
         for instance in ${JOB_INSTANCE_TYPES//,/ }; do
-            source /home/ec2/rp_preproc_venv/bin/activate
+            
             cp /home/ec2/mini_utils/data/reportportal.json $WORKSPACE
             sed -i "s/RP_TOKEN/${RP_TOKEN}/g" $WORKSPACE/reportportal.json
             sed -i "s/PROJECT/aws/g" $WORKSPACE/reportportal.json
             sed -i "s/RELEASE/${COMPOSE_ID}/g" $WORKSPACE/reportportal.json
             sed -i "s/INSTANCE/${instance}/g" $WORKSPACE/reportportal.json
             sed -i "s/ARCH/${ARCH}/g" $WORKSPACE/reportportal.json
-            rp_preproc -c $WORKSPACE/reportportal.json -d $WORKSPACE/os_tests_result_${instance} --debug
-            deactivate
+            rp_preproc -c $WORKSPACE/reportportal.json -d $WORKSPACE/os_tests_result_${instance} --debug > $WORKSPACE/${instance}.json 2>&1
+            launchid=$(cat  $WORKSPACE/${instance}.json |jq .reportportal.launches[0])
+            launchids="$launchid $launchids"
+            curl  -X POST -H "Authorization: bearer ${RP_TOKEN}" ${LOG_SERVER}/api/v1/aws/launch/analyze --header 'Content-type: application/json' -d '{"analyzeItemsMode": [  "TO_INVESTIGATE"],"analyzerMode": "ALL","analyzerTypeName": "autoAnalyzer","launchId": '$launchid'}'
         done
+        sleep 120
+        curl  -o  $WORKSPACE/defects_type.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/settings
+        for launchid in $launchids;do
+            curl  -o  $WORKSPACE/${launchid}.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/launch/$launchid
+            instance=$(cat $WORKSPACE/${launchid}.json|jq '.attributes[]|select(.key|match("instance")).value')
+            total=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.total)
+            passed=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.passed)
+            failed=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.failed)
+            skipped=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.skipped)
+            to_investigate=$(cat $WORKSPACE/${launchid}.json|jq .statistics.defects.to_investigate.total)
+            if ! [[ $to_investigate == null ]]; then
+                umb_testresult="failed"
+            else
+                to_investigate=0
+            fi
+            if [[ $failed == null ]]; then
+                failed=0
+            fi
+            if [[ $skipped == null ]]; then
+                skipped=0
+            fi
+            if [[ $passed == null ]]; then
+                passed=0
+            fi
+            testresult=$(cat <<-END
+    InstanceType:${instance}
+    Total:${total}
+    Passed:${passed:=0}
+    Failed:${failed:=0}
+    Skipped:${skipped:=0}
+    To_investigate:${to_investigate:=0}
+    ReportPortal:${LOG_SERVER}/ui/#aws/launches/all/${launchid}
+    ${testresult}
+END
+)
+        done
+        #cat $WORKSPACE/defects_type.json |jq '.subTypes.SYSTEM_ISSUE[]|select(.locator|match("si_1iexrfknerm92")).longName'
+        deactivate
     fi
     pass=$(grep PASS $WORKSPACE/total_sum.log|wc -l)
     failures=$(grep FAIL $WORKSPACE/total_sum.log|wc -l)
     errors=$(grep ERROR $WORKSPACE/total_sum.log|wc -l)
     total=$((pass+errors+failures))
     echo """
+TESTRESULT: > 
+$testresult
 PASS: $pass
 FAILURES: $failures
 ERRORS: $errors

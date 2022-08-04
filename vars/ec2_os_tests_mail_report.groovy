@@ -13,22 +13,16 @@ Summary:
 Test method: Automation
 Test suite:  ${result.TESTSUITE}
 Test result:
-   - Total: ${result.TOTAL}
-   - Pass:  ${result.PASS}
-   - Fail:  ${result.FAILURES}
-   - Error: ${result.ERRORS}
-Note: I will report bugs if there are new failures in the test log.
+${result.TESTRESULT}
+Note: all failures are known except to_investigate, I will review them.
 
 Main Packages:
    - ${result.COMPOSE_ID}
    - ${result.IMAGE}
-Instance Types:
-- ${result.JOB_INSTANCE_TYPES}
-
 Debug Log:
    - ${result.HTMLURL}
 History Logs:
-   - ${env.LOG_SERVER}
+   - ${env.LOG_SERVER}/ui/#aws
         """,
         subject: "${env.JOB_NAME} - ${env.BUILD_DISPLAY_NAME} - ${currentBuild.currentResult}",
         from: "${pipelineParams.MAILSENDER}",
