@@ -84,6 +84,18 @@ def call(Map pipelineParams) {
             RP_TOKEN=credentials("rp_serv_token")
         }
         stages {
+            stage('url trigger'){
+                when {
+                     triggeredBy 'URLTrigger'
+                }
+            steps{
+                echo 'url triggered'
+                script {
+                    env.COMPOSEID_URL = "http://mirror.stream.centos.org/9-stream/COMPOSE_ID"
+                }
+            }
+                
+            }
             stage('Parse COMPOSEID URL') {
                 steps {
                     cleanWs()

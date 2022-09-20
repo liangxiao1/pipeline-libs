@@ -5,13 +5,7 @@
 def call() {
     sh '''
     #!/bin/bash -x
-    if [[ ${BUILD_CAUSE} =~ 'XTRIGGERCAUSE' ]]; then
-        echo "This is url trigger!"
-        build_owner="URL_TRIGGER"
-        url_trigger_log=${JOB_URL}/urltriggerPollLog/
-        url_out=`curl $url_trigger_log`
-        trigger_url=`echo $url_out|grep COMPOSE |sed  's/.*\\(http.*latest-RHEL-[0-9]\\).*/\\1/'`
-    elif ! [ -z ${CI_MESSAGE} ]; then
+    if ! [ -z ${CI_MESSAGE} ]; then
         echo "This is triggerd by CI message."
         build_owner="UMB_TRIGGER"
         echo "CI Message: ${CI_MESSAGE}"
