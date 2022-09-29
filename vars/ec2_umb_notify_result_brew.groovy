@@ -10,14 +10,15 @@ def call() {
     } else {
         scratch = false
     }
-    def message_content = """\
+    def message_content = """
 {
-  "ci": {
+  "contact": {
     "name": "${ci.NAME}",
-    "team": "VirtQE-S1-AWS",
+    "team": "VirtCloudQE-AWS",
     "irc": "#AzureQE", 
     "url": "${env.JENKINS_URL}",
-    "email": "${ci.EMAIL}"
+    "email": "${ci.EMAIL}",
+    "docs": "https://github.com/liangxiao1/pipeline-libs"
   },
   "run": {
     "url": "${env.BUILD_URL}", 
@@ -33,18 +34,25 @@ def call() {
     "nvr": "${ci.JOB_INFO_NVR}",
     "scratch": ${scratch}
   },
-  "system": {
+  "system": [
+    {
     "os": "${ci.JOB_INFO_VOLUME_NAME}",
     "provider": "os-tests",
     "architecture": "${ci.ARCH}"
+    }
+  ],
+  "test": {
+    "type": "tier1",
+    "category": "functional",
+    "result": "${ci.UMB_TESTRESULT}",
+    "namespace": "${UMB_NAMESPACE}"
   },
-  "type": "tier1",
-  "category": "functional",
-  "thread_id": "${thread_id}",
-  "status": "${ci.UMB_TESTRESULT}",
-  "namespace": "${UMB_NAMESPACE}",
+  "pipeline": {
+      "id": "${thread_id}",
+      "name": "tier1-gating"
+  },
   "generated_at": "${date}",
-  "version": "0.1.0"
+  "version": "1.1.14"
 }"""
     echo "${message_content}"
     return sendCIMessage (

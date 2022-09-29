@@ -30,11 +30,13 @@ def call() {
     "id": "${ci.COMPOSE_ID}",
     "compose_type" : "gate"
   },
-  "system": {
+  "system": [
+    {
     "provider": "avocado-cloud",
     "architecture": "${ci.ARCH}",
     "variant" : "fast"
-  },
+    }
+  ],
   "label": [
             "${ci.ARCH}"
     ],
