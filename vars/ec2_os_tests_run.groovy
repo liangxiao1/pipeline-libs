@@ -138,6 +138,12 @@ instance_type: ${instance}
             curl  -X POST -H "Authorization: bearer ${RP_TOKEN}" ${LOG_SERVER}/api/v1/aws/launch/analyze --header 'Content-type: application/json' -d '{"analyzeItemsMode": [  "TO_INVESTIGATE"],"analyzerMode": "ALL","analyzerTypeName": "autoAnalyzer","launchId": '$launchid'}'
         done
         sleep 120
+        cd $WORKSPACE
+        for launchid in $launchids;do
+            # tfacon
+            /root/xen-ci/utils/tfacon.sh ${RP_TOKEN} aws $launchid
+        done
+        sleep 120
         curl  -o  $WORKSPACE/defects_type.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/settings
         for launchid in $launchids;do
             curl  -o  $WORKSPACE/${launchid}.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/launch/$launchid
