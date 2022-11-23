@@ -74,7 +74,8 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     JOB_INSTANCE_TYPES=$job_instance_types
     fi
     ssh_user='ec2-user'
-    if [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
+    # From CentOS-Stream-9, its default user is changed to ec2-user
+    if [[ $COMPOSE_ID =~ 'CentOS-Stream-8' ]]; then
         ssh_user='centos'
         echo "$ssh_user"
     fi
@@ -132,6 +133,9 @@ instance_type: ${instance}
             sed -i "s/RELEASE/${COMPOSE_ID}/g" $WORKSPACE/reportportal.json
             sed -i "s/INSTANCE/${instance}/g" $WORKSPACE/reportportal.json
             sed -i "s/ARCH/${ARCH}/g" $WORKSPACE/reportportal.json
+            sed -i "s/IS_NEW/${IS_NEW_INSTANCE}/g" $WORKSPACE/reportportal.json
+            debuglogurl="http://${NFS_SERVER}/results/iscsi/os_tests/$test_date/${WORKSPACE}"
+            sed -i "s|HTMLURL|${debuglogurl}|g" $WORKSPACE/reportportal.json
             rp_preproc -c $WORKSPACE/reportportal.json -d $WORKSPACE/os_tests_result_${instance} --debug > $WORKSPACE/${instance}.json 2>&1
             launchid=$(cat  $WORKSPACE/${instance}.json |jq .reportportal.launches[0])
             launchids="$launchid $launchids"
@@ -147,7 +151,7 @@ instance_type: ${instance}
         curl  -o  $WORKSPACE/defects_type.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/settings
         for launchid in $launchids;do
             curl  -o  $WORKSPACE/${launchid}.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/launch/$launchid
-            instance=$(cat $WORKSPACE/${launchid}.json|jq '.attributes[]|select(.key|match("instance")).value')
+            instance=$(cat $WORKSPACE/${launchid}.json|jq '.attributes[]|select(.key|match("^instance")).value')
             total=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.total)
             passed=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.passed)
             failed=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.failed)
