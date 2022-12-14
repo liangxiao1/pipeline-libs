@@ -12,13 +12,13 @@ def call(Map pipelineParams) {
             string(name: 'BASE_AMI', defaultValue: '', description: 'this job can be triggerd by COMPOSEID_URL, CI_MESSAGE or BASE_AMI')
             choice(name: 'UPDATE_BASEAMI', choices: ['true', 'false'], description: 'do you want to upgrade BASE_AMI to the latest? if not, will use BASE_AMI in testing without any change.')
             choice(name: 'UPLOAD_REPORTPORTAL', choices: ['true', 'false'], description: 'Upload test result to reportportal or not.')
+            choice(name: 'ENABLE_TFA', choices: ['false', 'true'], description: 'Call tfa to analyze test result in reportportal')
             choice(name: 'IS_NEW_INSTANCE', choices: ['false', 'true'], description: 'Set it to true if it is new instance(only for the first run)')
             string(name: 'POST_CMDS', defaultValue: 'yum update -y', description: 'option, extra command executed when update baseami')
             string(name: 'ARCH', defaultValue: pipelineParams.DEFAULT_ARCH, description: 'x86_64|aarch64')
             string(name: 'PROXY_URL', defaultValue: pipelineParams.DEFAULT_PROXY_URL, description: 'proxy ip:port to access internal ip')
             string(name: 'INSTANCE_TYPES', defaultValue: pipelineParams.DEFAULT_INSTANCE_TYPES, description: 'option, specify instance types you want to test, seperate by comma')
             string(name: 'INSTANCE_NUM', defaultValue: '', description: 'option, how many instance to you want to test, default nightly compose is 1, production compose is 8')
-            string(name: 'INSTANCE_DATE', defaultValue: '', description: 'option, only for new instance types available date')
             string(name: 'PKG_URL', defaultValue: '', description: 'option, Specify pkgs url you want to install')
             choice(name: 'IS_INSTALL_PKG_LIST', choices: ['true', 'false'], description: 'install extra pkgs required in run from default repo?')
             string(name: 'BRANCH_NAME', defaultValue: '', description: 'option, Specify branch name, eg. CentOS-Stream-8, RHEL-8.3')
@@ -68,6 +68,7 @@ def call(Map pipelineParams) {
             //COMPOSE_LOCATION="${pipelineParams.COMPOSE_LOCATION}"
             BREW_BUILD_URL="${pipelineParams.BREW_BUILD_URL}"
             UPLOAD_REPORTPORTAL="${pipelineParams.UPLOAD_REPORTPORTAL}"
+            ENABLE_TFA="${pipelineParams.ENABLE_TFA}"
             RP_TOKEN=credentials("rp_serv_token")
         }
         stages {

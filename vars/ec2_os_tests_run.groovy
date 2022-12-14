@@ -62,9 +62,10 @@ def call() {
             ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
         fi
     else
-        python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $JOB_INSTANCE_TYPES \
-        -f ${instances_yaml} --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
-        ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
+        echo "use specified $JOB_INSTANCE_TYPES"
+        # python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $JOB_INSTANCE_TYPES \
+        # -f ${instances_yaml} --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
+        # ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c
     fi
 
     if [[ -z $JOB_INSTANCE_TYPES ]]; then
@@ -79,7 +80,7 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
         ssh_user='centos'
         echo "$ssh_user"
     fi
-    cat ${instances_yaml}
+    #cat ${instances_yaml}
     test_date=$(date +%Y%m%d)
     for instance in ${JOB_INSTANCE_TYPES//,/ }; do
         echo """\
@@ -142,12 +143,14 @@ instance_type: ${instance}
             curl  -X POST -H "Authorization: bearer ${RP_TOKEN}" ${LOG_SERVER}/api/v1/aws/launch/analyze --header 'Content-type: application/json' -d '{"analyzeItemsMode": [  "TO_INVESTIGATE"],"analyzerMode": "ALL","analyzerTypeName": "autoAnalyzer","launchId": '$launchid'}'
         done
         sleep 120
-        cd $WORKSPACE
-        for launchid in $launchids;do
-            # tfacon
-            /root/xen-ci/utils/tfacon.sh ${RP_TOKEN} aws $launchid
-        done
-        sleep 120
+        if ${ENABLE_TFA}; then
+            cd $WORKSPACE
+            for launchid in $launchids;do
+                # tfacon
+                /root/xen-ci/utils/tfacon.sh ${RP_TOKEN} aws $launchid
+            done
+            sleep 120
+        fi
         curl  -o  $WORKSPACE/defects_type.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/settings
         for launchid in $launchids;do
             curl  -o  $WORKSPACE/${launchid}.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/launch/$launchid
