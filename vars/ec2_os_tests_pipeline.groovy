@@ -27,6 +27,7 @@ def call(Map pipelineParams) {
             choice(name: 'IS_INSTALL_PKG_LIST', choices: ['true', 'false'], description: 'install extra pkgs required in run from default repo?')
             string(name: 'BRANCH_NAME', defaultValue: '', description: 'option, Specify branch name, eg. CentOS-Stream-8, RHEL-8.3')
             string(name: 'RUN_CASES', defaultValue: pipelineParams.DEFALUT_RUN_CASES, description: 'case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
+            string(name: 'SKIP_CASES', defaultValue: pipelineParams.DEFALUT_SKIP_CASES, description: 'not run case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
             choice(name: 'EC2_PROFILE', choices: ['default', pipelineParams.DEFAULT_EC2_PROFILE1, pipelineParams.DEFAULT_EC2_PROFILE2], description: 'account used for testing!')
             string(name: 'EC2_REGION', defaultValue: 'us-west-2', description: 'which region the test run in?')
             string(name: 'EC2_SUBNET', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET, description: 'which subnet the test run in?')
@@ -54,6 +55,7 @@ def call(Map pipelineParams) {
             DEFAULT_PROXY_URL="${pipelineParams.DEFAULT_PROXY_URL}"
             DEFAULT_JSLAVE="${pipelineParams.DEFAULT_JSLAVE}"
             DEFALUT_RUN_CASES="${pipelineParams.DEFALUT_RUN_CASES}"
+            DEFALUT_SKIP_CASES="${pipelineParams.DEFALUT_SKIP_CASES}"
             DEFAULT_INSTANCE_TYPES="${pipelineParams.DEFAULT_INSTANCE_TYPES}"
             DEFAULT_ARCH="${pipelineParams.DEFAULT_ARCH}"
             KEY_NAME="${pipelineParams.KEY_NAME}"
