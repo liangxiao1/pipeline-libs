@@ -106,5 +106,8 @@ JOB_INSTANCE_TYPES: ${INSTANCE_TYPES}""" >> ${compose_parse_file}
         echo """\
 JOB_INSTANCE_TYPES=${INSTANCE_TYPES}""" >> $WORKSPACE/job_env.txt
     fi
+if ! [ -z ${CERT_PARAMS} ]  && ! [[ $CERT_PARAMS =~ 'null' ]]; then
+    python /home/ec2/mini_utils/json_parser.py -c "${CERT_PARAMS}" --dir "${WORKSPACE}" --tag CERT -d --append
+fi
 '''
 }

@@ -28,6 +28,7 @@ def call(Map pipelineParams) {
             string(name: 'BRANCH_NAME', defaultValue: '', description: 'option, Specify branch name, eg. CentOS-Stream-8, RHEL-8.3')
             string(name: 'RUN_CASES', defaultValue: pipelineParams.DEFALUT_RUN_CASES, description: 'case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
             string(name: 'SKIP_CASES', defaultValue: pipelineParams.DEFALUT_SKIP_CASES, description: 'not run case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
+            string(name: 'OS_TESTS_EXTRA_OPTIONS', defaultValue: pipelineParams.OS_TESTS_EXTRA_OPTIONS, description: 'append extra options to os-tests, https://github.com/virt-s1/os-tests/blob/master/os_tests/docs/os-tests_advanced_tips.md')
             choice(name: 'EC2_PROFILE', choices: ['default', pipelineParams.DEFAULT_EC2_PROFILE1, pipelineParams.DEFAULT_EC2_PROFILE2], description: 'account used for testing!')
             string(name: 'EC2_REGION', defaultValue: 'us-west-2', description: 'which region the test run in?')
             string(name: 'EC2_SUBNET', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET, description: 'which subnet the test run in?')
@@ -36,6 +37,7 @@ def call(Map pipelineParams) {
             string(name: 'NFS_SERVER', defaultValue: pipelineParams.NFS_SERVER, description: 'nfs server to save log')
             string(name: 'NFS_PATH_DIR', defaultValue: pipelineParams.NFS_PATH_DIR, description: 'export path from nfs server')
             string(name: 'NFS_MOUNT_POINT', defaultValue: pipelineParams.NFS_MOUNT_POINT, description: 'mount point in local')
+            text defaultValue: pipelineParams.CERT_PARAMS, description: 'Only for CCSP test for certification.', name: 'CERT_PARAMS'
         }
         options {
             buildDiscarder(logRotator(numToKeepStr: '20'))
@@ -58,6 +60,7 @@ def call(Map pipelineParams) {
             DEFALUT_SKIP_CASES="${pipelineParams.DEFALUT_SKIP_CASES}"
             DEFAULT_INSTANCE_TYPES="${pipelineParams.DEFAULT_INSTANCE_TYPES}"
             DEFAULT_ARCH="${pipelineParams.DEFAULT_ARCH}"
+            OS_TESTS_EXTRA_OPTIONS="${pipelineParams.OS_TESTS_EXTRA_OPTIONS}"
             KEY_NAME="${pipelineParams.KEY_NAME}"
             KEYFILE="${pipelineParams.KEYFILE}"
             DEFAULT_MAIL_SENDER="${pipelineParams.DEFAULT_MAIL_SENDER}"
@@ -76,6 +79,7 @@ def call(Map pipelineParams) {
             UPLOAD_REPORTPORTAL="${pipelineParams.UPLOAD_REPORTPORTAL}"
             ENABLE_TFA="${pipelineParams.ENABLE_TFA}"
             RP_TOKEN=credentials("rp_serv_token")
+            CERT_PARAMS="${pipelineParams.CERT_PARAMS}"
         }
         stages {
             stage('url trigger'){
