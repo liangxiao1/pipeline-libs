@@ -81,6 +81,10 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
         echo "$ssh_user"
     fi
     #cat ${instances_yaml}
+    volume_size=10
+    if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
+        volume_size=30
+    fi
     test_date=$(date +%Y%m%d)
     for instance in ${JOB_INSTANCE_TYPES//,/ }; do
         echo """\
@@ -97,6 +101,7 @@ security_group_ids : ${EC2_SG_GROUP}
 ssh_key_name : ${KEY_NAME}
 ec2_tagname : virtqe_auto_cloud
 instance_type: ${instance}
+volume_size: ${volume_size}
         """ >  $WORKSPACE/aws_${instance}.yaml
         if ! [[ -z $CPUS ]] && ! [[ $CPUS =~ 'null' ]]; then
             echo "cpus: ${CPUS}" >> $WORKSPACE/aws_${instance}.yaml
@@ -138,6 +143,16 @@ instance_type: ${instance}
         echo "HTMLURL: http://${NFS_SERVER}/results/iscsi/os_tests/$test_date/${WORKSPACE}" >> $WORKSPACE/job_env.yaml
     else
         echo "HTMLURL: NotSetNFS_SEVER" >> $WORKSPACE/job_env.yaml
+    fi
+    if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
+        echo "get all certification xml files"
+        cert_logs=$(find $WORKSPACE/os_tests_result_${instance}/attachments -name *rhcert*xml)
+        sed -i "/CERT_CERT_ATTACHMENT/d" $WORKSPACE/job_env.yaml
+        sed -i "/CERT_CERT_ATTACHMENT/d" $WORKSPACE/job_env.txt
+        echo """\
+CERT_CERT_ATTACHMENT: '${cert_logs}'""" >> $WORKSPACE/job_env.yaml
+echo """\
+CERT_CERT_ATTACHMENT='${cert_logs}'""" >> $WORKSPACE/job_env.txt
     fi
     deactivate
     testresult=''

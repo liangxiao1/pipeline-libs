@@ -51,9 +51,9 @@ def call() {
     if [[ $COMPOSE_ID =~ 'RHEL-7' ]]; then
         pkgs="install,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,ntpdate,perf,nvme-cli,pciutils,fio,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,strace,sos,strace,acpid"
     elif [[ $COMPOSE_ID =~ 'RHEL-8' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel,sos,strace,acpid,mokutil,libfabric,openmpi"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel,sos,strace,acpid,mokutil,libfabric,openmpi,kernel-modules-extra,iproute-tc"
     elif [[ $COMPOSE_ID =~ 'RHEL-9' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace,acpid,mokutil,libfabric,openmpi"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace,acpid,mokutil,libfabric,openmpi,kernel-modules-extra,iproute-tc"
     elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
         if [[ $COMPOSE_ID =~ 'CentOS-Stream-8' ]]; then
             ssh_user='centos'
@@ -83,10 +83,19 @@ def call() {
         --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user --keyfile ${KEYFILE} \
         --proxy_url ${PROXY_URL} --instance_type $instance_type"
     cmd='uname -r'
+    if ! [ -z $PKGS ]; then
+        pkgs="${pkgs},${PKGS}"
+    fi
     if ${UPDATE_BASEAMI}; then
         cmd=${POST_CMDS}
         if ${IS_INSTALL_PKG_LIST}; then
             build_cmd="${build_cmd} --pkgs $pkgs"
+        fi
+    fi
+    if ${ENABLE_CERTREPO}; then
+        cmd=${POST_CMDS}
+        if ${IS_INSTALL_PKG_LIST}; then
+            build_cmd="${build_cmd} --pkgs $pkgs --enable_certrepo"
         fi
     fi
 

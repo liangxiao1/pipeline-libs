@@ -23,12 +23,14 @@ def call(Map pipelineParams) {
             string(name: 'DISKS', defaultValue: '', description: 'optional, instance spec info, can retrive it automatically except preview instances')
             string(name: 'NET_BANDWIDTH', defaultValue: '', description: 'optional, instance spec info, can retrive it automatically except preview instances')
             string(name: 'INSTANCE_NUM', defaultValue: '', description: 'option, how many instance to you want to test, default nightly compose is 1, production compose is 2')
-            string(name: 'PKG_URL', defaultValue: '', description: 'option, Specify pkgs url you want to install')
+            string(name: 'PKG_URL', defaultValue: '', description: 'option, specify pkgs url you want to install, for pkgs not in the repo')
+            string(name: 'PKGS', defaultValue: pipelineParams.PKGS, description: 'option, specify pkg names you want to add or upgrade, for pkgs in the repo')
+            choice(name: 'ENABLE_CERTREPO', choices: ['false', 'true'], description: 'enable cert repos or not')
             choice(name: 'IS_INSTALL_PKG_LIST', choices: ['true', 'false'], description: 'install extra pkgs required in run from default repo?')
             string(name: 'BRANCH_NAME', defaultValue: '', description: 'option, Specify branch name, eg. CentOS-Stream-8, RHEL-8.3')
             string(name: 'RUN_CASES', defaultValue: pipelineParams.DEFALUT_RUN_CASES, description: 'case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
             string(name: 'SKIP_CASES', defaultValue: pipelineParams.DEFALUT_SKIP_CASES, description: 'not run case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
-            string(name: 'OS_TESTS_EXTRA_OPTIONS', defaultValue: pipelineParams.OS_TESTS_EXTRA_OPTIONS, description: 'append extra options to os-tests, https://github.com/virt-s1/os-tests/blob/master/os_tests/docs/os-tests_advanced_tips.md')
+            string(name: 'OS_TESTS_EXTRA_OPTIONS', defaultValue: '', description: 'append extra options to os-tests, https://github.com/virt-s1/os-tests/blob/master/os_tests/docs/os-tests_advanced_tips.md')
             choice(name: 'EC2_PROFILE', choices: ['default', pipelineParams.DEFAULT_EC2_PROFILE1, pipelineParams.DEFAULT_EC2_PROFILE2], description: 'account used for testing!')
             string(name: 'EC2_REGION', defaultValue: 'us-west-2', description: 'which region the test run in?')
             string(name: 'EC2_SUBNET', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET, description: 'which subnet the test run in?')
@@ -37,7 +39,7 @@ def call(Map pipelineParams) {
             string(name: 'NFS_SERVER', defaultValue: pipelineParams.NFS_SERVER, description: 'nfs server to save log')
             string(name: 'NFS_PATH_DIR', defaultValue: pipelineParams.NFS_PATH_DIR, description: 'export path from nfs server')
             string(name: 'NFS_MOUNT_POINT', defaultValue: pipelineParams.NFS_MOUNT_POINT, description: 'mount point in local')
-            text defaultValue: pipelineParams.CERT_PARAMS, description: 'Only for CCSP test for certification.', name: 'CERT_PARAMS'
+            text (defaultValue: pipelineParams.CERT_PARAMS, description: 'Only for CCSP test for certification.', name: 'CERT_PARAMS')
         }
         options {
             buildDiscarder(logRotator(numToKeepStr: '20'))
@@ -58,9 +60,9 @@ def call(Map pipelineParams) {
             DEFAULT_JSLAVE="${pipelineParams.DEFAULT_JSLAVE}"
             DEFALUT_RUN_CASES="${pipelineParams.DEFALUT_RUN_CASES}"
             DEFALUT_SKIP_CASES="${pipelineParams.DEFALUT_SKIP_CASES}"
-            DEFAULT_INSTANCE_TYPES="${pipelineParams.DEFAULT_INSTANCE_TYPES}"
-            DEFAULT_ARCH="${pipelineParams.DEFAULT_ARCH}"
-            OS_TESTS_EXTRA_OPTIONS="${pipelineParams.OS_TESTS_EXTRA_OPTIONS}"
+            DEFAULT_INSTANCE_TYPES="${env.INSTANCE_TYPES}"
+            DEFAULT_ARCH="${env.ARCH}"
+            OS_TESTS_EXTRA_OPTIONS="${env.OS_TESTS_EXTRA_OPTIONS}"
             KEY_NAME="${pipelineParams.KEY_NAME}"
             KEYFILE="${pipelineParams.KEYFILE}"
             DEFAULT_MAIL_SENDER="${pipelineParams.DEFAULT_MAIL_SENDER}"
@@ -68,18 +70,18 @@ def call(Map pipelineParams) {
             DEFAULT_MAIL_RECEIVER_FAIL="${pipelineParams.DEFAULT_MAIL_RECEIVER_FAIL}"
             UMB_NAMESPACE="${pipelineParams.UMB_NAMESPACE}"
             UMB_TOPIC="${pipelineParams.UMB_TOPIC}"
-            NFS_SERVER="${pipelineParams.NFS_SERVER}"
-            NFS_PATH_DIR="${pipelineParams.NFS_PATH_DIR}"
-            NFS_MOUNT_POINT="${pipelineParams.NFS_MOUNT_POINT}"
+            NFS_SERVER="${env.NFS_SERVER}"
+            NFS_PATH_DIR="${env.NFS_PATH_DIR}"
+            NFS_MOUNT_POINT="${env.NFS_MOUNT_POINT}"
             LOG_SERVER="${pipelineParams.LOG_SERVER}"
             TESTOWNER="${pipelineParams.TESTOWNER}"
-            IS_INSTALL_PKG_LIST="${pipelineParams.IS_INSTALL_PKG_LIST}"
+            IS_INSTALL_PKG_LIST="${env.IS_INSTALL_PKG_LIST}"
             //COMPOSE_LOCATION="${pipelineParams.COMPOSE_LOCATION}"
             BREW_BUILD_URL="${pipelineParams.BREW_BUILD_URL}"
-            UPLOAD_REPORTPORTAL="${pipelineParams.UPLOAD_REPORTPORTAL}"
-            ENABLE_TFA="${pipelineParams.ENABLE_TFA}"
+            UPLOAD_REPORTPORTAL="${env.UPLOAD_REPORTPORTAL}"
+            ENABLE_TFA="${env.ENABLE_TFA}"
             RP_TOKEN=credentials("rp_serv_token")
-            CERT_PARAMS="${pipelineParams.CERT_PARAMS}"
+            CERT_PARAMS="${env.CERT_PARAMS}"
         }
         stages {
             stage('url trigger'){
@@ -106,6 +108,10 @@ def call(Map pipelineParams) {
                             error('Scratch build. Aborted.')
                         }
                         //COMPOSE_ENV_YAML = readFile file: "job_env.yaml".trim()
+                        if (env.CERT_PARAMS){
+                            rhcert_product()
+                            rhcert_cert_ticket()
+                        }
                     }
                 }
             }
@@ -134,6 +140,9 @@ def call(Map pipelineParams) {
                     }
                     else{
                         ec2_umb_notify_result()
+                    }
+                    if (env.CERT_PARAMS){
+                        rhcert_cert_attachment()
                     }
                 }
                 cleanWs()
