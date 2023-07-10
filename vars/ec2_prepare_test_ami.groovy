@@ -83,9 +83,12 @@ def call() {
         --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user --keyfile ${KEYFILE} \
         --proxy_url ${PROXY_URL} --instance_type $instance_type"
     cmd='uname -r'
-    if ! [ -z $PKGS ]; then
+    if [[ $PKGS =~ 'certification' ]]; then
+        pkgs="${PKGS}"
+    elif ! [ -z $PKGS ]; then
         pkgs="${pkgs},${PKGS}"
     fi
+
     if ${UPDATE_BASEAMI}; then
         cmd=${POST_CMDS}
         if ${IS_INSTALL_PKG_LIST}; then
