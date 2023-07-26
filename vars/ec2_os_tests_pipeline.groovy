@@ -14,7 +14,7 @@ def call(Map pipelineParams) {
             choice(name: 'UPLOAD_REPORTPORTAL', choices: ['true', 'false'], description: 'Upload test result to reportportal or not.')
             choice(name: 'ENABLE_TFA', choices: ['false', 'true'], description: 'Call tfa to analyze test result in reportportal')
             choice(name: 'IS_NEW_INSTANCE', choices: ['false', 'true'], description: 'Set it to true if it is new instance(only for the first run)')
-            string(name: 'POST_CMDS', defaultValue: 'yum update -y', description: 'option, extra command executed when update baseami')
+            string(name: 'POST_CMDS', defaultValue: 'uname', description: 'option, extra command executed when update baseami')
             string(name: 'ARCH', defaultValue: pipelineParams.DEFAULT_ARCH, description: 'x86_64|aarch64')
             string(name: 'PROXY_URL', defaultValue: pipelineParams.DEFAULT_PROXY_URL, description: 'proxy ip:port to access internal ip')
             string(name: 'INSTANCE_TYPES', defaultValue: pipelineParams.DEFAULT_INSTANCE_TYPES, description: 'option, specify instance types you want to test, seperate by comma')

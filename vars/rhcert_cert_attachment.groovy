@@ -27,7 +27,7 @@ def call() {
     fi
 
     echo "upload new attachment ${CERT_CERT_ATTACHMENT}"
-    python rhcert_manager.py $cmd_options --attachment "${CERT_CERT_ATTACHMENT}" --attachment_desc "${CERT_CERT_ATTACHMENT}" --attachment_upload
+    python rhcert_manager.py $cmd_options --attachment "${CERT_CERT_ATTACHMENT}" --attachment_desc "Auto uploaded." --attachment_upload
     python rhcert_manager.py $cmd_options --attachments_list
     '''
 }
