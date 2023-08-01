@@ -26,7 +26,17 @@ def call() {
     fi
 
     echo "create new cert ticket since CERT_ID or  CERT_CASENUMBER not provided"
-    out=$(python rhcert_manager.py cert --classificationId ${CERT_CERT_CLASSIFICATIONID} --partnerProductId ${CERT_PRODUCT_ID}  --certificationTypeId ${CERT_CERT_CERTIFICATIONTYPEID} --new)
+    if [[ ${ARCH} =~ 'x86' ]]; then
+        platformId=1
+    else
+        platformId=7
+    fi
+    if ! [[ -z ${CERT_CERT_VERSIONID} ]]; then
+        content="{\\"versionId\\":\\"${CERT_CERT_VERSIONID}\\",\\"platformId\\":\\"$platformId\\"}"
+    else
+        content="{\\"platformId\\":\\"$platformId\\"}"
+    fi
+    out=$(python rhcert_manager.py cert --classificationId ${CERT_CERT_CLASSIFICATIONID} --partnerProductId ${CERT_PRODUCT_ID}  --certificationTypeId ${CERT_CERT_CERTIFICATIONTYPEID} --content $content --new)
     if (( $? != 0 )); then
         echo $out
         exit 1
