@@ -122,7 +122,7 @@ volume_size: ${volume_size}
         if ! [[ -z $NET_BANDWIDTH ]] && ! [[ $NET_BANDWIDTH =~ 'null' ]]; then
             echo "net_bandwidth: ${NET_BANDWIDTH}" >> $WORKSPACE/aws_${instance}.yaml
         fi
-        if ! [[ -z ${CERT_PRODUCT_ID} ]] && ! [[ $instance =~ 'flex' ]]; then
+        if ! [[ -z ${CERT_PRODUCT_ID} ]] && ! [[ $instance =~ 'flex' ]] && ! [[ $instance =~ 't3' ]]; then
         # flex instance does not support placement group option
             echo "placement_group_name : xiliang_place" >> $WORKSPACE/aws_${instance}.yaml
         fi
