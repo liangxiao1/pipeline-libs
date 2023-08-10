@@ -110,22 +110,13 @@ ec2_tagname : virtqe_auto_cloud
 instance_type: ${instance}
 volume_size: ${volume_size}
         """ >  $WORKSPACE/aws_${instance}.yaml
-        if ! [[ -z $CPUS ]] && ! [[ $CPUS =~ 'null' ]]; then
-            echo "cpus: ${CPUS}" >> $WORKSPACE/aws_${instance}.yaml
+        if ! [[ -z $MORE_OS_TESTS_SETTING ]] && ! [[ $MORE_OS_TESTS_SETTING =~ 'null' ]]; then
+            echo "${MORE_OS_TESTS_SETTING}" >> $WORKSPACE/aws_${instance}.yaml
         fi
-        if ! [[ -z $MEMORY ]] && ! [[ $MEMORY =~ 'null' ]]; then
-            echo "memory: ${MEMORY}" >> $WORKSPACE/aws_${instance}.yaml
-        fi
-        if ! [[ -z $DISKS ]] && ! [[ $DISKS =~ 'null' ]]; then
-            echo "disks: ${DISKS}" >> $WORKSPACE/aws_${instance}.yaml
-        fi
-        if ! [[ -z $NET_BANDWIDTH ]] && ! [[ $NET_BANDWIDTH =~ 'null' ]]; then
-            echo "net_bandwidth: ${NET_BANDWIDTH}" >> $WORKSPACE/aws_${instance}.yaml
-        fi
-        if ! [[ -z ${CERT_PRODUCT_ID} ]] && ! [[ $instance =~ 'flex' ]] && ! [[ $instance =~ 't3' ]]; then
+        #if ! [[ -z ${CERT_PRODUCT_ID} ]] && ! [[ $instance =~ 'flex' ]] && ! [[ $instance =~ 't3' ]]; then
         # flex instance does not support placement group option
-            echo "placement_group_name : xiliang_place" >> $WORKSPACE/aws_${instance}.yaml
-        fi
+        #    echo "placement_group_name : xiliang_place" >> $WORKSPACE/aws_${instance}.yaml
+        #fi
         cmd_options="--user $ssh_user --keyfile ${KEYFILE} --platform_profile $WORKSPACE/aws_${instance}.yaml --result $WORKSPACE/os_tests_result_${instance} -p ${RUN_CASES}"
         if ! [[ -z $SKIP_CASES ]] && ! [[ $SKIP_CASES =~ 'null' ]]; then
             cmd_options="${cmd_options} -s ${SKIP_CASES}"
