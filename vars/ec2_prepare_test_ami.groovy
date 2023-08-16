@@ -20,7 +20,7 @@ def call() {
 
     if [[ -z $JOB_BASE_AMI ]]; then
         echo "No JOB_BASE_AMI specified, auto select one!"
-        source /home/ec2/ec2_venv/bin/activate
+        source /home/ec2/p3_venv/bin/activate
         cd /home/ec2/mini_utils/
         if ! [ -z $COMPOSE_ID ]; then
             python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -d -p ${ARCH}
@@ -77,12 +77,18 @@ def call() {
     tmp_log=$(mktemp)
     echo "Temp update log: $tmp_log"
     repo_url=$REPO_URL
-    source /home/ec2/ec2_venv/bin/activate
+    source /home/ec2/p3_venv/bin/activate
     cd /home/ec2/mini_utils/
     build_cmd="python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
         --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user --keyfile ${KEYFILE} \
         --proxy_url ${PROXY_URL} --instance_type $instance_type"
-    cmd='uname -r'
+    
+    if [ -z ${POST_CMDS} ]; then
+        post_cmd='uname -r'
+    else
+        post_cmd=${POST_CMDS}
+    fi
+
     if [[ $PKGS =~ 'certification' ]]; then
         pkgs="${PKGS}"
     elif ! [ -z $PKGS ]; then
@@ -90,13 +96,11 @@ def call() {
     fi
 
     if ${UPDATE_BASEAMI}; then
-        cmd=${POST_CMDS}
         if ${IS_INSTALL_PKG_LIST}; then
             build_cmd="${build_cmd} --pkgs $pkgs"
         fi
     fi
     if ${ENABLE_CERTREPO}; then
-        cmd=${POST_CMDS}
         if ${IS_INSTALL_PKG_LIST}; then
             build_cmd="${build_cmd} --pkgs $pkgs --enable_certrepo"
         fi
@@ -108,11 +112,11 @@ def call() {
     elif ! [ -z $JOB_INFO_BUILD_ID ]; then
         $build_cmd --pkg_url $PKG_URL  > $tmp_log 2>&1
     elif [[ -z $PKG_URL && $COMPOSEID_URL != "UNSPECIFIED" ]]; then
-        $build_cmd --repo_url $repo_url --cmds "$cmd" > $tmp_log 2>&1
+        $build_cmd --repo_url $repo_url --cmds "$post_cmd" > $tmp_log 2>&1
     elif [[ -z $PKG_URL && $COMPOSEID_URL == "UNSPECIFIED" ]]; then
-        $build_cmd --cmds "$cmd"  > $tmp_log 2>&1
+        $build_cmd --cmds "$post_cmd"  > $tmp_log 2>&1
     else
-        $build_cmd --repo_url $repo_url --pkg_url $PKG_URL --cmds "$cmd"  > $tmp_log 2>&1
+        $build_cmd --repo_url $repo_url --pkg_url $PKG_URL --cmds "$post_cmd"  > $tmp_log 2>&1
     fi
 
     deactivate

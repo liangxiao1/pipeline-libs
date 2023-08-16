@@ -114,7 +114,7 @@ volume_size: ${volume_size}
             echo "${MORE_OS_TESTS_SETTING}" >> $WORKSPACE/aws_${instance}.yaml
         fi
         #if ! [[ -z ${CERT_PRODUCT_ID} ]] && ! [[ $instance =~ 'flex' ]] && ! [[ $instance =~ 't3' ]]; then
-        # flex instance does not support placement group option
+        # flex instance does not support placement group optio, please pass by paramters in trigger job
         #    echo "placement_group_name : xiliang_place" >> $WORKSPACE/aws_${instance}.yaml
         #fi
         cmd_options="--user $ssh_user --keyfile ${KEYFILE} --platform_profile $WORKSPACE/aws_${instance}.yaml --result $WORKSPACE/os_tests_result_${instance} -p ${RUN_CASES}"

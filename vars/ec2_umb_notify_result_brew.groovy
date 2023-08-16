@@ -45,7 +45,8 @@ def call() {
     "type": "tier1",
     "category": "functional",
     "result": "${ci.UMB_TESTRESULT}",
-    "namespace": "${UMB_NAMESPACE}"
+    "namespace": "${UMB_NAMESPACE}",
+    "docs": "https://github.com/virt-s1/os-tests"
   },
   "pipeline": {
       "id": "${thread_id}",
