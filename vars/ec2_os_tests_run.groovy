@@ -106,7 +106,7 @@ subnet_id_ipv6 : ${EC2_SUBNET}
 subnet_id_ipv4 : ${EC2_SUBNET} 
 security_group_ids : ${EC2_SG_GROUP}
 ssh_key_name : ${KEY_NAME}
-ec2_tagname : virtqe_auto_cloud
+tagname : os_tests_ec2_${BUILD_DISPLAY_NAME}
 instance_type: ${instance}
 volume_size: ${volume_size}
         """ >  $WORKSPACE/aws_${instance}.yaml

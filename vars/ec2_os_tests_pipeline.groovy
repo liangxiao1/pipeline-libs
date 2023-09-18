@@ -88,7 +88,7 @@ def call(Map pipelineParams) {
                 steps{
                     echo 'url triggered'
                     script {
-                        env.COMPOSEID_URL = "http://mirror.stream.centos.org/9-stream/COMPOSE_ID"
+                        env.COMPOSEID_URL = "https://mirror.stream.centos.org/9-stream/COMPOSE_ID"
                     }
             }
                 
