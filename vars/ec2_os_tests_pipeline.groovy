@@ -39,7 +39,8 @@ def call(Map pipelineParams) {
             text (defaultValue: pipelineParams.CERT_PARAMS, description: 'Only for CCSP test for certification.', name: 'CERT_PARAMS')
         }
         options {
-            buildDiscarder(logRotator(numToKeepStr: '20'))
+            buildDiscarder(logRotator(numToKeepStr: '25'))
+            timeout(time: 24, unit: 'HOURS') 
         }
         environment {
             PYTHONPATH="${env.WORKSPACE}"
