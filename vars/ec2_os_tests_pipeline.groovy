@@ -76,7 +76,7 @@ def call(Map pipelineParams) {
             IS_INSTALL_PKG_LIST="${pipelineParams.IS_INSTALL_PKG_LIST}"
             //COMPOSE_LOCATION="${pipelineParams.COMPOSE_LOCATION}"
             BREW_BUILD_URL="${pipelineParams.BREW_BUILD_URL}"
-            UPLOAD_REPORTPORTAL="${env.UPLOAD_REPORTPORTAL}"
+            UPLOAD_REPORTPORTAL="${pipelineParams.UPLOAD_REPORTPORTAL}"
             ENABLE_TFA="${env.ENABLE_TFA}"
             RP_TOKEN=credentials("rp_serv_token")
             CERT_PARAMS="${env.CERT_PARAMS}"
