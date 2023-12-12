@@ -161,23 +161,26 @@ CERT_CERT_ATTACHMENT='${cert_logs}'""" >> $WORKSPACE/job_env.txt
     umb_testresult="passed"
     if ${UPLOAD_REPORTPORTAL}; then
         launchids=''
+        launchuuids=''
         echo "upload test result to reportportal"
-        source /home/ec2/rp_preproc_venv/bin/activate
+        source /home/p3_venv/bin/activate
         for instance in ${JOB_INSTANCE_TYPES//,/ }; do
-            
-            cp /home/ec2/mini_utils/data/reportportal.json $WORKSPACE
-            sed -i "s/RP_TOKEN/${RP_TOKEN}/g" $WORKSPACE/reportportal.json
-            sed -i "s/PROJECT/aws/g" $WORKSPACE/reportportal.json
-            sed -i "s/RELEASE/${COMPOSE_ID}/g" $WORKSPACE/reportportal.json
-            sed -i "s/INSTANCE/${instance}/g" $WORKSPACE/reportportal.json
-            sed -i "s/ARCH/${ARCH}/g" $WORKSPACE/reportportal.json
-            sed -i "s/IS_NEW/${IS_NEW_INSTANCE}/g" $WORKSPACE/reportportal.json
+            cfg_file="rp_manager.yaml"
+            cp /home/ec2/mini_utils/data/$cfg_file $WORKSPACE
+            sed -i "s/RP_TOKEN/${RP_TOKEN}/g" $WORKSPACE/$cfg_file
+            sed -i "s/PROJECT/aws/g" $WORKSPACE/$cfg_file
+            sed -i "s/RELEASE/${COMPOSE_ID}/g" $WORKSPACE/$cfg_file
+            sed -i "s/INSTANCE/${instance}/g" $WORKSPACE/$cfg_file
+            sed -i "s/ARCH/${ARCH}/g" $WORKSPACE/$cfg_file
+            sed -i "s/IS_NEW/${IS_NEW_INSTANCE}/g" $WORKSPACE/$cfg_file
             debuglogurl="http://${NFS_SERVER}/results/iscsi/os_tests/$test_date/${WORKSPACE}"
-            sed -i "s|HTMLURL|${debuglogurl}|g" $WORKSPACE/reportportal.json
-            rp_preproc -c $WORKSPACE/reportportal.json -d $WORKSPACE/os_tests_result_${instance} --debug > $WORKSPACE/${instance}.json 2>&1
-            launchid=$(cat  $WORKSPACE/${instance}.json |jq .reportportal.launches[0])
+            sed -i "s|HTMLURL|${debuglogurl}|g" $WORKSPACE/$cfg_file
+            launchuuid=$(rp_manager launch --cfg $WORKSPACE/$cfg_file --logdir $WORKSPACE/os_tests_result_${instance} --new)
+            rp_manager launch --cfg $WORKSPACE/$cfg_file --uuid $launchuuid --analyze
+            #rp_preproc -c $WORKSPACE/$cfg_file -d $WORKSPACE/os_tests_result_${instance} --debug > $WORKSPACE/${instance}.json 2>&1
+            #launchid=$(cat  $WORKSPACE/${instance}.json |jq .reportportal.launches[0])
             launchids="$launchid $launchids"
-            curl  -X POST -H "Authorization: bearer ${RP_TOKEN}" ${LOG_SERVER}/api/v1/aws/launch/analyze --header 'Content-type: application/json' -d '{"analyzeItemsMode": [  "TO_INVESTIGATE"],"analyzerMode": "ALL","analyzerTypeName": "autoAnalyzer","launchId": '$launchid'}'
+            launchuuids="$launchuuid $launchuuids"
         done
         sleep 120
         if ${ENABLE_TFA}; then
@@ -189,18 +192,22 @@ CERT_CERT_ATTACHMENT='${cert_logs}'""" >> $WORKSPACE/job_env.txt
             sleep 120
         fi
         curl  -o  $WORKSPACE/defects_type.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/settings
-        for launchid in $launchids;do
-            curl  -o  $WORKSPACE/${launchid}.json -X GET -H "Authorization: bearer ${RP_TOKEN}" --header 'Accept: application/json'  ${LOG_SERVER}/api/v1/aws/launch/$launchid
-            instance=$(cat $WORKSPACE/${launchid}.json|jq '.attributes[]|select(.key|match("^instance")).value')
-            total=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.total)
-            passed=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.passed)
-            failed=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.failed)
-            skipped=$(cat $WORKSPACE/${launchid}.json|jq .statistics.executions.skipped)
-            to_investigate=$(cat $WORKSPACE/${launchid}.json|jq .statistics.defects.to_investigate.total)
+        for launchuuid in $launchuuids;do
+            launchinfo=$(rp_manager launch --cfg $WORKSPACE/$cfg_file --uuid $launchuuid --list)
+            instance=$(echo $launchinfo|jq '.attributes[]|select(.key|match("^instance")).value')
+            total=$(echo $launchinfo|jq .statistics.executions.total)
+            passed=$(echo $launchinfo|jq .statistics.executions.passed)
+            failed=$(echo $launchinfo|jq .statistics.executions.failed)
+            skipped=$(echo $launchinfo|jq .statistics.executions.skipped)
+            to_investigate=$(echo $launchinfo|jq .statistics.defects.to_investigate.total)
             if ! [[ $to_investigate == null ]]; then
                 umb_testresult="failed"
             else
                 to_investigate=0
+            fi
+            if [[ $skipped == $to_investigate ]]; then
+                to_investigate=0
+                umb_testresult="passed"
             fi
             if [[ $failed == null ]]; then
                 failed=0
@@ -218,7 +225,7 @@ CERT_CERT_ATTACHMENT='${cert_logs}'""" >> $WORKSPACE/job_env.txt
     Failed:${failed:=0}
     Skipped:${skipped:=0}
     To_investigate:${to_investigate:=0}
-    ReportPortal:${LOG_SERVER}/ui/#aws/launches/all/${launchid}
+    ReportPortal:${LOG_SERVER}/ui/#aws/launches/all/${launchuuid}
     ${testresult}
 END
 )
@@ -226,9 +233,9 @@ END
         #cat $WORKSPACE/defects_type.json |jq '.subTypes.SYSTEM_ISSUE[]|select(.locator|match("si_1iexrfknerm92")).longName'
         deactivate
     fi
-    pass=$(grep PASS $WORKSPACE/total_sum.log|wc -l)
-    failures=$(grep FAIL $WORKSPACE/total_sum.log|wc -l)
-    errors=$(grep ERROR $WORKSPACE/total_sum.log|wc -l)
+    pass=$(grep "PASS$" $WORKSPACE/total_sum.log|wc -l)
+    failures=$(grep "FAIL$" $WORKSPACE/total_sum.log|wc -l)
+    errors=$(grep "ERROR$" $WORKSPACE/total_sum.log|wc -l)
     total=$((pass+errors+failures))
     echo """
 TESTRESULT: > 
