@@ -31,6 +31,7 @@ def call(Map pipelineParams) {
             choice(name: 'EC2_PROFILE', choices: ['default', pipelineParams.DEFAULT_EC2_PROFILE1, pipelineParams.DEFAULT_EC2_PROFILE2], description: 'account used for testing!')
             string(name: 'EC2_REGION', defaultValue: 'us-west-2', description: 'which region the test run in?')
             string(name: 'EC2_SUBNET', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET, description: 'which subnet the test run in?')
+            string(name: 'EC2_SUBNET_IPV6ONLY', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET_IPV6ONLY, description: 'which ipv6-pnly subnet the test run in?')
             string(name: 'EC2_SG_GROUP', defaultValue: pipelineParams.DEFAULT_EC2_SG_GROUP, description: 'which security group the test run in?')
             string(name: 'EC2_ADDITIONALINFO', defaultValue: '', description: 'please split it by ";" if have more items')
             string(name: 'NFS_SERVER', defaultValue: pipelineParams.NFS_SERVER, description: 'nfs server to save log')
@@ -53,6 +54,7 @@ def call(Map pipelineParams) {
             DEFAULT_EC2_PROFILE1="${pipelineParams.DEFAULT_EC2_PROFILE1}"
             DEFAULT_EC2_PROFILE2="${pipelineParams.DEFAULT_EC2_PROFILE2}"
             DEFAULT_EC2_SUBNET="${pipelineParams.DEFAULT_EC2_SUBNET}"
+            DEFAULT_EC2_SUBNET_IPV6ONLY="${pipelineParams.DEFAULT_EC2_SUBNET_IPV6ONLY}"            
             DEFAULT_EC2_SG_GROUP="${pipelineParams.DEFAULT_EC2_SG_GROUP}"
             DEFAULT_PROXY_URL="${pipelineParams.DEFAULT_PROXY_URL}"
             DEFAULT_JSLAVE="${pipelineParams.DEFAULT_JSLAVE}"

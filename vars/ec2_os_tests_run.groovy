@@ -7,6 +7,7 @@
 // params.EC2_REGION=''
 // params.EC2_PROFILE=""
 // params.EC2_SUBNET=""
+// params.EC2_SUBNET_IPV6ONLY=""
 // params.EC2_SG_GROUP=""
 // params.PROXY_URL=""
 // params.ARCH='x86_64|aarch64'
@@ -104,6 +105,7 @@ region : ${EC2_REGION}
 availability_zone : "${EC2_REGION}a"
 subnet_id_ipv6 : ${EC2_SUBNET} 
 subnet_id_ipv4 : ${EC2_SUBNET} 
+subnet_id_ipv6only: ${EC2_SUBNET_IPV6ONLY} 
 security_group_ids : ${EC2_SG_GROUP}
 ssh_key_name : ${KEY_NAME}
 tagname : os_tests_ec2_${BUILD_DISPLAY_NAME}
