@@ -74,14 +74,12 @@ def call() {
         echo "It is nightly build, wait ${waitseconds}s to make sure repo ready!"
         sleep ${waitseconds}
     fi
-    tmp_log=$(mktemp)
-    echo "Temp update log: $tmp_log"
     repo_url=$REPO_URL
     source /home/ec2/p3_venv/bin/activate
     cd /home/ec2/mini_utils/
     build_cmd="python ec2_ami_build.py --profile ${EC2_PROFILE} --ami-id $ami_id  --key_name ${KEY_NAME} --security_group_ids ${EC2_SG_GROUP} \
         --region ${EC2_REGION} --subnet_id ${EC2_SUBNET} --tag ${VM_PREFIX}_${COMPOSE_ID}_${ARCH} --user $ssh_user --keyfile ${KEYFILE} \
-        --proxy_url ${PROXY_URL} --instance_type $instance_type"
+        --proxy_url ${PROXY_URL} --instance_type $instance_type --new_ami $WORKSPACE/test_ami"
     
     if [ -z ${POST_CMDS} ]; then
         post_cmd='uname -r'
@@ -110,19 +108,19 @@ def call() {
         new_ami=$ami_id
         echo "Use baseami $new_ami directly in testing"
     elif ! [ -z $JOB_INFO_BUILD_ID ]; then
-        $build_cmd --pkg_url $PKG_URL  > $tmp_log 2>&1
+        $build_cmd --pkg_url $PKG_URL
     elif [[ -z $PKG_URL && $COMPOSEID_URL != "UNSPECIFIED" ]]; then
-        $build_cmd --repo_url $repo_url --cmds "$post_cmd" > $tmp_log 2>&1
+        $build_cmd --repo_url $repo_url --cmds "$post_cmd"
     elif [[ -z $PKG_URL && $COMPOSEID_URL == "UNSPECIFIED" ]]; then
-        $build_cmd --cmds "$post_cmd"  > $tmp_log 2>&1
+        $build_cmd --cmds "$post_cmd"
     else
-        $build_cmd --repo_url $repo_url --pkg_url $PKG_URL --cmds "$post_cmd"  > $tmp_log 2>&1
+        $build_cmd --repo_url $repo_url --pkg_url $PKG_URL --cmds "$post_cmd"
     fi
 
     deactivate
     if ${UPDATE_BASEAMI}; then
-        cat $tmp_log
-        new_ami=$(cat $tmp_log| grep 'New AMI:'|awk -F':' '{print $NF}')
+        cat $WORKSPACE/test_ami
+        new_ami=$(cat $WORKSPACE/test_ami)
         echo "Use $new_ami for test"
     fi
     echo "IMAGE=$new_ami" >> $WORKSPACE/job_env.txt
