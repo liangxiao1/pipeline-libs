@@ -28,7 +28,8 @@ def call(Map pipelineParams) {
             string(name: 'RUN_CASES', defaultValue: pipelineParams.DEFALUT_RUN_CASES, description: 'case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
             string(name: 'SKIP_CASES', defaultValue: pipelineParams.DEFALUT_SKIP_CASES, description: 'not run case tags, eg. acceptance, cloudinit, kernel_tier1 or one casename')
             string(name: 'OS_TESTS_EXTRA_OPTIONS', defaultValue: '', description: 'append extra options to os-tests command line, https://github.com/virt-s1/os-tests/blob/master/os_tests/docs/os-tests_advanced_tips.md')
-            choice(name: 'EC2_PROFILE', choices: ['default', pipelineParams.DEFAULT_EC2_PROFILE1, pipelineParams.DEFAULT_EC2_PROFILE2], description: 'account used for testing!')
+            //choice(name: 'EC2_PROFILE', choices: ['default', pipelineParams.DEFAULT_EC2_PROFILE1, pipelineParams.DEFAULT_EC2_PROFILE2,pipelineParams.DEFAULT_EC2_PROFILE3], description: 'account used for testing!')
+            string(name: 'EC2_PROFILE', defaultValue: 'default', description: pipelineParams.DEFAULT_EC2_PROFILES)
             string(name: 'EC2_REGION', defaultValue: 'us-west-2', description: 'which region the test run in?')
             string(name: 'EC2_SUBNET', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET, description: 'which subnet the test run in?')
             string(name: 'EC2_SUBNET_IPV6ONLY', defaultValue: pipelineParams.DEFAULT_EC2_SUBNET_IPV6ONLY, description: 'which ipv6-pnly subnet the test run in?')
@@ -51,8 +52,7 @@ def call(Map pipelineParams) {
             DST_STORAGE="${BASENAME}eastus"
             SRC_GROUP="${SRC_STORAGE}"
             DST_GROUP="${DST_STORAGE}"
-            DEFAULT_EC2_PROFILE1="${pipelineParams.DEFAULT_EC2_PROFILE1}"
-            DEFAULT_EC2_PROFILE2="${pipelineParams.DEFAULT_EC2_PROFILE2}"
+            DEFAULT_EC2_PROFILES="${pipelineParams.DEFAULT_EC2_PROFILES}"
             DEFAULT_EC2_SUBNET="${pipelineParams.DEFAULT_EC2_SUBNET}"
             DEFAULT_EC2_SUBNET_IPV6ONLY="${pipelineParams.DEFAULT_EC2_SUBNET_IPV6ONLY}"            
             DEFAULT_EC2_SG_GROUP="${pipelineParams.DEFAULT_EC2_SG_GROUP}"
