@@ -19,7 +19,7 @@ def call() {
             if ! [[ ${JOB_INFO_PACKAGE_NAME} =~ 'kernel' ]]; then
                 python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-\\d*.*(noarch|${DEFAULT_ARCH})" --excludekeys "src"
             else
-                python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-" --excludekeys "src,devel,internal,debuginfo,extra,headers,cross,debug,tools,rt,uki,64k" --andkeys "${DEFAULT_ARCH}" --element a --field href     
+                python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "${JOB_INFO_PACKAGE_NAME}-" --excludekeys "src,devel-,internal,debuginfo,extra,headers,cross,debug,tools,rt,uki,64k" --andkeys "${DEFAULT_ARCH}" --element a --field href     
             fi
             python /home/ec2/mini_utils/html_parser.py --url "${BREW_BUILD_URL}${JOB_INFO_BUILD_ID}" --dir "${WORKSPACE}" --keyword "Tags" --element tr --field text --name BREWTAG -r
             source ${WORKSPACE}/job_env.txt

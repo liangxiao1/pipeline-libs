@@ -95,7 +95,7 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     fi
     ssh_password=$(openssl rand -base64 8)
     test_date=$(date +%Y%m%d)
-    for instance in ${JOB_INSTANCE_TYPES//,/ }; do
+    for instance in ${JOB_INSTANCE_TYPES// / }; do
         echo """\
 Cloud:
     provider : aws

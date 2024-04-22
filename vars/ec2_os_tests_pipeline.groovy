@@ -17,7 +17,7 @@ def call(Map pipelineParams) {
             string(name: 'POST_CMDS', defaultValue: 'uname', description: 'option, extra command executed when update baseami')
             string(name: 'ARCH', defaultValue: pipelineParams.DEFAULT_ARCH, description: 'x86_64|aarch64')
             string(name: 'PROXY_URL', defaultValue: pipelineParams.DEFAULT_PROXY_URL, description: 'proxy ip:port to access internal ip')
-            string(name: 'INSTANCE_TYPES', defaultValue: pipelineParams.DEFAULT_INSTANCE_TYPES, description: 'option, specify instance types you want to test, seperate by comma')
+            string(name: 'INSTANCE_TYPES', defaultValue: pipelineParams.DEFAULT_INSTANCE_TYPES, description: 'option, specify instance types you want to test, seperate by space')
             text (name: 'MORE_OS_TESTS_SETTING', defaultValue: '', description: 'Append more yaml settings to os-tests run')
             string(name: 'INSTANCE_NUM', defaultValue: '', description: 'option, how many instance to you want to test, default nightly compose is 1, production compose is 2')
             string(name: 'PKG_URL', defaultValue: '', description: 'option, specify pkgs url you want to install, for pkgs not in the repo')
