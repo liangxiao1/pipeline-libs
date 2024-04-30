@@ -93,7 +93,6 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
         volume_size=20
     fi
-    ssh_password=$(openssl rand -base64 8)
     test_date=$(date +%Y%m%d)
     for instance in ${JOB_INSTANCE_TYPES// / }; do
         echo """\
@@ -109,7 +108,6 @@ subnet_id_ipv4 : ${EC2_SUBNET}
 subnet_id_ipv6only: ${EC2_SUBNET_IPV6ONLY} 
 security_group_ids : ${EC2_SG_GROUP}
 ssh_key_name : ${KEY_NAME}
-vm_password : ${ssh_password}
 tagname : os_tests_ec2_${BUILD_DISPLAY_NAME}
 instance_type: ${instance}
 volume_size: ${volume_size}
