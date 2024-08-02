@@ -110,6 +110,7 @@ security_group_ids : ${EC2_SG_GROUP}
 ssh_key_name : ${KEY_NAME}
 tagname : os_tests_ec2_${BUILD_DISPLAY_NAME}
 instance_type: ${instance}
+customize_block_device_map: True
 volume_size: ${volume_size}
         """ >  $WORKSPACE/aws_${instance}.yaml
         if ! [[ -z $MORE_OS_TESTS_SETTING ]] && ! [[ $MORE_OS_TESTS_SETTING =~ 'null' ]]; then
@@ -178,7 +179,8 @@ CERT_CERT_ATTACHMENT='${cert_logs}'""" >> $WORKSPACE/job_env.txt
             debuglogurl="http://${NFS_SERVER}/results/iscsi/os_tests/$test_date/${WORKSPACE}"
             sed -i "s|HTMLURL|${debuglogurl}|g" $WORKSPACE/$cfg_file
             launchuuid=$(rp_manager launch --cfg $WORKSPACE/$cfg_file --logdir $WORKSPACE/os_tests_result_${instance} --new)
-            rp_manager launch --cfg $WORKSPACE/$cfg_file --uuid $launchuuid --analyze
+            # skip trigger analyze because our reportportal service has error in build-in auto analyze
+            #rp_manager launch --cfg $WORKSPACE/$cfg_file --uuid $launchuuid --analyze
             #rp_preproc -c $WORKSPACE/$cfg_file -d $WORKSPACE/os_tests_result_${instance} --debug > $WORKSPACE/${instance}.json 2>&1
             #launchid=$(cat  $WORKSPACE/${instance}.json |jq .reportportal.launches[0])
             launchids="$launchid $launchids"
