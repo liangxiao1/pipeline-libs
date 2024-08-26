@@ -112,6 +112,7 @@ tagname : os_tests_ec2_${BUILD_DISPLAY_NAME}
 instance_type: ${instance}
 customize_block_device_map: True
 volume_size: ${volume_size}
+comment: '[{"key":"project", "value":"aws"}, {"key":"testsuite","value":"os-tests"},{"key":"release","value":"${COMPOSE_ID}"},{"key":"instance","value":"${instance}"},{"key":"arch", "value":"${ARCH}"},{"key":"new_instance", "value":"${IS_NEW_INSTANCE}"}]'
         """ >  $WORKSPACE/aws_${instance}.yaml
         if ! [[ -z $MORE_OS_TESTS_SETTING ]] && ! [[ $MORE_OS_TESTS_SETTING =~ 'null' ]]; then
             echo "${MORE_OS_TESTS_SETTING}" >> $WORKSPACE/aws_${instance}.yaml
@@ -129,7 +130,6 @@ volume_size: ${volume_size}
         fi
         os-tests ${cmd_options}
         
-        cat $WORKSPACE/os_tests_result_${instance}/results/sum.log >> $WORKSPACE/total_sum.log
         if ! [[ -z $NFS_SERVER ]]; then
             echo "Save log to remote ${NFS_SERVER}"
             if ! [[ -d ${NFS_MOUNT_POINT} ]]; then
@@ -236,15 +236,42 @@ END
         done
         #cat $WORKSPACE/defects_type.json |jq '.subTypes.SYSTEM_ISSUE[]|select(.locator|match("si_1iexrfknerm92")).longName'
         deactivate
+    else
+    for instance in ${JOB_INSTANCE_TYPES//,/ }; do
+    sum_xml="$WORKSPACE/os_tests_result_${instance}/results/sum.xml"
+    sum_results="$WORKSPACE/os_tests_result_${instance}/results/sum_results.log"
+    xmllint --xpath "/testsuites/testsuite/@tests" $sum_xml >> $sum_results
+    xmllint --xpath "/testsuites/testsuite/@passed" $sum_xml >> $sum_results
+    xmllint --xpath "/testsuites/testsuite/@errors" $sum_xml >> $sum_results
+    xmllint --xpath "/testsuites/testsuite/@skipped" $sum_xml >> $sum_results
+    xmllint --xpath "/testsuites/testsuite/@failures" $sum_xml >> $sum_results
+    source $sum_results
+    passed=${passed:=0}
+    failures=${failures:=0}
+    errors=${errors:=0}
+    skipped=${skipped:=0}
+    testresult=$(cat <<-END
+    InstanceType:${instance}
+    Total:${tests}
+    Passed:${passed:=0}
+    Failed:${failures:=0}
+    Errors:${errors:=0}
+    Skipped:${skipped:=0}
+    ${testresult}
+END
+)
+    if (($failures>0)); then
+        umb_testresult="failed"
     fi
-    pass=$(grep "PASS$" $WORKSPACE/total_sum.log|wc -l)
-    failures=$(grep "FAIL$" $WORKSPACE/total_sum.log|wc -l)
-    errors=$(grep "ERROR$" $WORKSPACE/total_sum.log|wc -l)
-    total=$((pass+errors+failures))
+    if (($errors>0)); then
+        umb_testresult="failed"
+    fi
+    done
+fi
     echo """
 TESTRESULT: > 
 $testresult
-PASS: $pass
+PASS: $passed
 FAILURES: $failures
 ERRORS: $errors
 TOTAL: $total
