@@ -117,6 +117,9 @@ comment: '[{"key":"project", "value":"aws"}, {"key":"testsuite","value":"os-test
         if ! [[ -z $MORE_OS_TESTS_SETTING ]] && ! [[ $MORE_OS_TESTS_SETTING =~ 'null' ]]; then
             echo "${MORE_OS_TESTS_SETTING}" >> $WORKSPACE/aws_${instance}.yaml
         fi
+        if ! [[ -z $BOOT_MODE ]] && [[ ${BOOT_MODE} =~ 'sev' ]]; then
+            echo "amdsevsnp: True" >> $WORKSPACE/aws_${instance}.yaml
+        fi
         #if ! [[ -z ${CERT_PRODUCT_ID} ]] && ! [[ $instance =~ 'flex' ]] && ! [[ $instance =~ 't3' ]]; then
         # flex instance does not support placement group optio, please pass by paramters in trigger job
         #    echo "placement_group_name : xiliang_place" >> $WORKSPACE/aws_${instance}.yaml

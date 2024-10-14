@@ -22,19 +22,26 @@ def call() {
         echo "No JOB_BASE_AMI specified, auto select one!"
         source /home/ec2/p3_venv/bin/activate
         cd /home/ec2/mini_utils/
+        ami_options=''
+        if ! [ -z $ARCH ]; then
+            ami_options=" -p ${ARCH}"
+        fi
+        if ! [ -z $BOOT_MODE ]; then
+           ami_options="${ami_options} -m ${BOOT_MODE}"
+        fi
         if ! [ -z $COMPOSE_ID ]; then
-            python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -d -p ${ARCH}
-            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -p ${ARCH})
+            python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id -d ${ami_options}
+            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s ami_id ${ami_options})
             branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c $COMPOSE_ID -s branch_name)
         elif ! [ -z $BRANCH_NAME ]; then
-            python ec2_ami_select.py -f data/branch_map.yaml -c ${BRANCH_NAME} -s ami_id -d -p ${ARCH}
-            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${BRANCH_NAME} -s ami_id -p ${ARCH})
+            python ec2_ami_select.py -f data/branch_map.yaml -c ${BRANCH_NAME} -s ami_id -d -p ${ami_options}
+            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c ${BRANCH_NAME} -s ami_id -p ${ami_options})
             branch_name = ${BRANCH_NAME}
         else
             # sleep 60 to wait brew tag
             sleep 60
-            python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s ami_id -d -p ${ARCH}
-            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s ami_id -p ${ARCH})
+            python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s ami_id -d -p  ${ami_options}
+            ami_id=$(python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s ami_id -p ${ami_options})
             branch_name=$(python ec2_ami_select.py -f data/branch_map.yaml -c "${JOB_PKGURL}${JOB_BREWTAG//' '}" -s branch_name)
         fi
         if ! [ -z $branch_name ]; then
@@ -53,9 +60,9 @@ def call() {
     elif [[ $COMPOSE_ID =~ 'RHEL-8' ]]; then
         pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,php-cli,php-xml,php-json,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,kernel-debug,python3,dracut-fips,podman,xdp-tools,openssl-devel,sos,strace,acpid,mokutil,libfabric,openmpi,kernel-modules-extra,iproute-tc,libcgroup,bcc-tools,libbpf,wireshark-cli,tcpdump,nmap-ncat"
     elif [[ $COMPOSE_ID =~ 'RHEL-9' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace,acpid,mokutil,libfabric,openmpi,kernel-modules-extra,iproute-tc,libcgroup,bcc-tools,libbpf,wireshark-cli,tcpdump,nmap-ncat,net-tools"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace,acpid,mokutil,libfabric,openmpi,kernel-modules-extra,iproute-tc,libcgroup,bcc-tools,libbpf,wireshark-cli,tcpdump,nmap-ncat,net-tools,tpm2-tools,tpm2-abrmd"
     elif [[ $COMPOSE_ID =~ 'RHEL-10' ]]; then
-        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace,acpid,mokutil,libfabric,openmpi,kernel-modules-extra,iproute-tc,libcgroup,bcc-tools,libbpf,wireshark-cli,tcpdump,nmap-ncat,net-tools"
+        pkgs="make,automake,autoconf,sysstat,gcc,unzip,wget,quota,bzip2,iperf3,pciutils,fio,psmisc,expect,perf,nvme-cli,pciutils,fio,libaio-devel,blktrace,fio,nvme-cli,git,tar,nfs-utils,libvirt,qemu-kvm,python3,dracut-fips,kernel-debug,python3-pip,hostname,podman,xdp-tools,openssl-devel,glibc-all-langpacks,sos,strace,acpid,mokutil,libfabric,openmpi,kernel-modules-extra,iproute-tc,libcgroup,bcc-tools,libbpf,wireshark-cli,tcpdump,nmap-ncat,net-tools,tpm2-tools,tpm2-abrmd"
     elif [[ $COMPOSE_ID =~ 'CentOS-Stream' ]]; then
         if [[ $COMPOSE_ID =~ 'CentOS-Stream-8' ]]; then
             ssh_user='centos'
