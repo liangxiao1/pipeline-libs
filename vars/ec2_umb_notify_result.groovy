@@ -14,8 +14,8 @@ def call() {
 {
   "ci": {
     "name": "${ci.NAME}",
-    "team": "VirtQE-S1-AWS",
-    "irc": "#AzureQE", 
+    "team": "VirtCloud",
+    "slack": "team-virt-cloud-qe",
     "url": "${env.JENKINS_URL}",
     "email": "${ci.EMAIL}"
   },

@@ -14,8 +14,8 @@ def call() {
 {
   "contact": {
     "name": "${ci.NAME}",
-    "team": "VirtCloudQE-AWS",
-    "irc": "#AzureQE", 
+    "team": "VirtCloud",
+    "slack": "team-virt-cloud-qe",
     "url": "${env.JENKINS_URL}",
     "email": "${ci.EMAIL}",
     "docs": "https://github.com/liangxiao1/pipeline-libs"
