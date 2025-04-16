@@ -91,7 +91,7 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     #cat ${instances_yaml}
     volume_size=10
     if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
-        volume_size=20
+        volume_size=30
     fi
     test_date=$(date +%Y%m%d)
     for instance in ${JOB_INSTANCE_TYPES// / }; do
