@@ -91,7 +91,7 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     #cat ${instances_yaml}
     volume_size=10
     if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
-        volume_size=20
+        volume_size=30
     fi
     test_date=$(date +%Y%m%d)
     for instance in ${JOB_INSTANCE_TYPES// / }; do
@@ -170,7 +170,7 @@ CERT_CERT_ATTACHMENT='${cert_logs}'""" >> $WORKSPACE/job_env.txt
         launchuuids=''
         echo "upload test result to reportportal"
         source /home/p3_venv/bin/activate
-        for instance in ${JOB_INSTANCE_TYPES//,/ }; do
+        for instance in ${JOB_INSTANCE_TYPES// / }; do
             cfg_file="rp_manager.yaml"
             cp /home/ec2/mini_utils/data/$cfg_file $WORKSPACE
             sed -i "s/RP_TOKEN/${RP_TOKEN}/g" $WORKSPACE/$cfg_file
@@ -240,7 +240,7 @@ END
         #cat $WORKSPACE/defects_type.json |jq '.subTypes.SYSTEM_ISSUE[]|select(.locator|match("si_1iexrfknerm92")).longName'
         deactivate
     else
-    for instance in ${JOB_INSTANCE_TYPES//,/ }; do
+    for instance in ${JOB_INSTANCE_TYPES// / }; do
     sum_xml="$WORKSPACE/os_tests_result_${instance}/results/sum.xml"
     sum_results="$WORKSPACE/os_tests_result_${instance}/results/sum_results.log"
     xmllint --xpath "/testsuites/testsuite/@tests" $sum_xml >> $sum_results
