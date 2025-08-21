@@ -45,12 +45,12 @@ def call() {
             python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -${ARCH} -r \
             -f ${instances_yaml} --num_instances $instance_num --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \
             ${EC2_SG_GROUP} --subnet_id ${EC2_SUBNET} --zone ${EC2_REGION}a -c --max_mem 16
-        elif ! [ -z $JOB_INFO_BUILD_ID ]; then
+        elif ! [ -z $JOB_BUILD_BUILD_ID ]; then
             # virt-what test t2.small,t3.small,z1d.metal,t4g.small,m6g.metal instances
-            if [[ ${JOB_INFO_PACKAGE_NAME} =~ 'virt-what' ]]; then
+            if [[ ${JOB_BUILD_PACKAGE_NAME} =~ 'virt-what' ]]; then
                 instances='t2.small,t3.small,t4g.small,c6g.medium,m6g.metal,z1d.metal'
                 RUN_CASES='virtwhat'
-            elif [[ ${JOB_INFO_PACKAGE_NAME} =~ 'kernel' ]]; then
+            elif [[ ${JOB_BUILD_PACKAGE_NAME} =~ 'kernel' ]]; then
                 # c4.large for kernel 2184745
                 instances='c4.large,t3.small,t4g.small,c6g.medium'
                 RUN_CASES=${DEFALUT_RUN_CASES}
@@ -59,7 +59,7 @@ def call() {
                 RUN_CASES=${DEFALUT_RUN_CASES}
             fi
             if [[ -z $RUN_CASES ]]; then
-                RUN_CASES=${JOB_INFO_PACKAGE_NAME/'-'/'_'}
+                RUN_CASES=${JOB_BUILD_PACKAGE_NAME/'-'/'_'}
             fi
             python ec2_instance_select.py --profile ${EC2_PROFILE} --ami-id $IMAGE -t $instances \
                  -f ${instances_yaml} --region ${EC2_REGION} --key_name ${KEY_NAME} --security_group_ids \

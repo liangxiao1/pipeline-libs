@@ -28,15 +28,15 @@ def call() {
   },
   "artifact": {
     "type": "brew-build",
-    "id": ${ci.JOB_INFO_TASK_ID},
-    "issuer": "${ci.JOB_INFO_OWNER_NAME}",
-    "component": "${ci.JOB_INFO_PACKAGE_NAME}",
-    "nvr": "${ci.JOB_INFO_NVR}",
+    "id": ${ci.JOB_BUILD_TASK_ID},
+    "issuer": "${ci.JOB_BUILD_OWNER_NAME}",
+    "component": "${ci.JOB_BUILD_PACKAGE_NAME}",
+    "nvr": "${ci.JOB_BUILD_NVR}",
     "scratch": ${scratch}
   },
   "system": [
     {
-    "os": "${ci.JOB_INFO_VOLUME_NAME}",
+    "os": "${ci.JOB_BUILD_VOLUME_NAME}",
     "provider": "os-tests",
     "architecture": "${ci.ARCH}"
     }
