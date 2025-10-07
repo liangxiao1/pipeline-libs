@@ -135,6 +135,11 @@ comment: '[{"key":"project", "value":"aws"}, {"key":"testsuite","value":"os-test
         
         if ! [[ -z $NFS_SERVER ]]; then
             echo "Save log to remote ${NFS_SERVER}"
+            nfs_status=$(bash -c 'ret=$(timeout 3s stat '"${NFS_MOUNT_POINT}"' >/dev/null 2>&1; echo $?); echo $ret')
+            if [ $nfs_status -eq 124 ]; then
+                echo "Warning: NFS mount point at ${NFS_MOUNT_POINT} is not responsive. Skipping log archival for this instance."
+                continue
+            fi
             if ! [[ -d ${NFS_MOUNT_POINT} ]]; then
                 echo "${NFS_MOUNT_POINT} not found, create it"
                 mkdir ${NFS_MOUNT_POINT}
