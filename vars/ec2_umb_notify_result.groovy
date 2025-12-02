@@ -1,6 +1,6 @@
 // publish UMB messages to ci dashboard
 def call() {
-    ci = readYaml file: "job_env.yaml"
+    def ci = readYaml file: "job_env.yaml"
     String date = sh(script: 'date -uIs', returnStdout: true).trim()
     echo "${date}"
     def thread_id = sh(script: "echo ${ci.COMPOSE_ID}${ci.ARCH} | md5sum | awk '{print \$1}'", returnStdout: true).trim()

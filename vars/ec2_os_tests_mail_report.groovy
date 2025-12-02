@@ -2,7 +2,7 @@
 // You can write variables to job_env.yaml
 // echo "XXX: YYY" >> ${WORKSPACE}/job_env.yaml
 def call(Map pipelineParams) {
-    result = readYaml file: "job_env.yaml"
+    def result = readYaml file: "job_env.yaml"
     emailext (
         body: """
 ${env.JOB_NAME} - ${env.BUILD_DISPLAY_NAME} - ${currentBuild.currentResult}
