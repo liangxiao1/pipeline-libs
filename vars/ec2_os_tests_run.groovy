@@ -111,6 +111,7 @@ ssh_key_name : ${KEY_NAME}
 tagname : os_tests_ec2_${BUILD_DISPLAY_NAME}
 instance_type: ${instance}
 customize_block_device_map: True
+is_allow_delete: True
 volume_size: ${volume_size}
 comment: '[{"key":"project", "value":"aws"}, {"key":"testsuite","value":"os-tests"},{"key":"release","value":"${COMPOSE_ID}"},{"key":"instance","value":"${instance}"},{"key":"arch", "value":"${ARCH}"},{"key":"new_instance", "value":"${IS_NEW_INSTANCE}"}]'
         """ >  $WORKSPACE/aws_${instance}.yaml
