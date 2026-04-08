@@ -90,7 +90,7 @@ JOB_INSTANCE_TYPES: $job_instance_types""" >> $WORKSPACE/job_env.yaml
     fi
     #cat ${instances_yaml}
     volume_size=10
-    if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
+    if ! [[ ${RUN_CASES} =~ 'rhcert' ]]; then
         volume_size=30
     fi
     test_date=$(date +%Y%m%d)
@@ -121,7 +121,7 @@ comment: '[{"key":"project", "value":"aws"}, {"key":"testsuite","value":"os-test
         if ! [[ -z $BOOT_MODE ]] && [[ ${BOOT_MODE} =~ 'sev' ]]; then
             echo "amdsevsnp: True" >> $WORKSPACE/aws_${instance}.yaml
         fi
-        #if ! [[ -z ${CERT_PRODUCT_ID} ]] && ! [[ $instance =~ 'flex' ]] && ! [[ $instance =~ 't3' ]]; then
+        #if ! [[ ${RUN_CASES} =~ 'rhcert' ]] && ! [[ $instance =~ 'flex' ]] && ! [[ $instance =~ 't3' ]]; then
         # flex instance does not support placement group optio, please pass by paramters in trigger job
         #    echo "placement_group_name : xiliang_place" >> $WORKSPACE/aws_${instance}.yaml
         #fi
@@ -158,7 +158,7 @@ comment: '[{"key":"project", "value":"aws"}, {"key":"testsuite","value":"os-test
     else
         echo "HTMLURL: NotSetNFS_SEVER" >> $WORKSPACE/job_env.yaml
     fi
-    if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
+    if ! [[ ${RUN_CASES} =~ 'rhcert' ]]; then
         echo "get all certification xml files"
         cert_logs=$(find $WORKSPACE/os_tests_result_${instance}/attachments -name *rhcert*xml)
         sed -i "/CERT_CERT_ATTACHMENT/d" $WORKSPACE/job_env.yaml

@@ -5,7 +5,11 @@ def call() {
     cmd_options="cert"
     source /home/p3_venv/bin/activate
     rhcert_manager token --refresh
-    source $WORKSPACE/job_env.txt 
+    source $WORKSPACE/job_env.txt
+    if [[ -z ${CERT_CERT_ATTACHMENT} ]]; then
+        echo "no cert logs found, skip"
+        exit 1
+    fi
     if ! [[ -z ${CERT_CERT_ID} ]]; then
        cmd_options="${cmd_options} --id ${CERT_CERT_ID}"
        echo "use exists certification id: ${CERT_CERT_ID}"

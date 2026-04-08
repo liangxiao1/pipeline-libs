@@ -108,10 +108,10 @@ def call(Map pipelineParams) {
                             error('Scratch build. Aborted.')
                         }
                         //COMPOSE_ENV_YAML = readFile file: "job_env.yaml".trim()
-                        if (env.CERT_PARAMS){
-                            rhcert_product()
-                            rhcert_cert_ticket()
-                        }
+                        //if (env.CERT_PARAMS){
+                        //    rhcert_product()
+                        //    rhcert_cert_ticket()
+                        //}
                     }
                 }
             }
@@ -142,6 +142,8 @@ def call(Map pipelineParams) {
                         ec2_umb_notify_result()
                     }
                     if (env.CERT_PARAMS){
+                        rhcert_product()
+                        rhcert_cert_ticket()
                         rhcert_cert_attachment()
                     }
                 }

@@ -7,6 +7,10 @@ def call() {
     rhcert_manager token --refresh
     source $WORKSPACE/job_env.txt
 
+    if [[ -z ${CERT_CERT_ATTACHMENT} ]]; then
+        echo "no cert logs found, skip product creation"
+        exit 1
+    fi
     if ! [[ -z ${CERT_PRODUCT_ID} ]]; then
        cmd_options="${cmd_options} --id ${CERT_PRODUCT_ID}"
        echo "use exists product id: ${CERT_PRODUCT_ID}"
